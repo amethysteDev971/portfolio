@@ -13,12 +13,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(private EmailVerifier $emailVerifier)
+    public function __construct(private EmailVerifier $emailVerifier, private TokenStorageInterface $tokenStorage)
     {
+        $this->emailVerifier = $emailVerifier;
+        $this->tokenStorage = $tokenStorage;
     }
 
     #[Route('/register', name: 'app_register')]
@@ -34,9 +38,16 @@ class RegistrationController extends AbstractController
 
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-
+            $user->setRoles(['ROLE_USER','ROLE_ADMIN']);
             $entityManager->persist($user);
             $entityManager->flush();
+
+            // Connecter automatiquement l'utilisateur après l'inscription
+            $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+            $this->tokenStorage->setToken($token);
+            
+            // Ajouter un flash message
+            $this->addFlash('success', 'Registration successful! You are now logged in.');
 
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
