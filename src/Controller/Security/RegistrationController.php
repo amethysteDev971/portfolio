@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Controller;
+namespace App\Controller\Security;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
@@ -79,7 +78,21 @@ class RegistrationController extends AbstractController
             $user = $this->getUser();
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $exception->getReason());
+            
+            if ($request->query->getInt('expires') <= time()) {
+                // generate a signed url and email it to the user
+                $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+                (new TemplatedEmail())
+                    ->from(new Address('contact@amethyste-design.com', 'Mail'))
+                    ->to((string) $user->getEmail())
+                    ->subject('Please Confirm your Email')
+                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                );
+                $this->addFlash('info', 'The link to verify your email has expired, a new one has been send');
+            }else{
+                $this->addFlash('verify_email_error', $exception->getReason());
+            }
+
 
             return $this->redirectToRoute('app_register');
         }
@@ -88,15 +101,5 @@ class RegistrationController extends AbstractController
         $this->addFlash('success', 'Your email address has been verified.');
 
         return $this->redirectToRoute('app_admin_dashboard');
-        // return $this->redirectToRoute('app_register');
-
-    //     Next:
-    // 1) Install some missing packages:
-    //     composer require symfony/mailer
-    // 2) In RegistrationController::verifyUserEmail():
-    //     * Customize the last redirectToRoute() after a successful email verification.
-    //     * Make sure you're rendering success flash messages or change the $this->addFlash() line.
-    // 3) Review and customize the form, controller, and templates as needed.
-    // 4) Run "php bin/console make:migration" to generate a migration for the newly added User::isVerified property.
     }
 }
