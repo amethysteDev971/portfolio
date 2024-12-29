@@ -3,18 +3,18 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-    <form method="post">
+    {# <form method="post">
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
+        {% endif %} #}
 
         {% if app.user %}
-            <div class="mb-3">
+            <div class="mb-3" style="display:none">
                 You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
             </div>
         {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        {# <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
         <label for="username">Email</label>
         <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
         <label for="password">Password</label>
@@ -22,7 +22,7 @@
 
         <input type="hidden" name="_csrf_token"
                value="{{ csrf_token('authenticate') }}"
-        >
+        > #}
 
         {#
             Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
@@ -34,8 +34,60 @@
             </div>
         #}
 
-        <button class="btn btn-lg btn-primary" type="submit">
+        {# <button class="btn btn-lg btn-primary" type="submit">
             Sign in
         </button>
-    </form>
+    </form> #}
+    <section class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex flex-col items-center justify-start px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div class="flex items-center text-2xl font-semibold text-gray-900 dark:text-white">
+                <img
+                class="w-32 h-32"
+                src="{{ asset('images/logo_picto.svg') }}"
+                alt="user photo"
+                />
+        </div>
+        <div class="uppercase flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            Amethyste Design
+        </div>
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    Connectez-vous à votre compte
+                </h1>
+                <form method="post" class="space-y-4 md:space-y-6">
+                     {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+                    <div>
+                    {# <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus> #}
+                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Votre adresse email</label>
+                        <input type="email"  value="{{ last_username }}" name="_username" id="username" autocomplete="email" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required autofocus>
+                    </div>
+                    <div>
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mot de passe</label>
+                        <input type="password" name="_password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" autocomplete="current-password" required>
+                        <input type="hidden" name="_csrf_token"
+                            value="{{ csrf_token('authenticate') }}"> 
+                    </div>
+                    {# <div class="flex items-center justify-between">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="remember" class="text-gray-500 dark:text-gray-300">Remember me</label>
+                            </div>
+                        </div>
+                        <a href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</a>
+                    </div> #}
+                    <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Se connecter</button>
+                    <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                        Don’t have an account yet? <a href="{{ path('app_register') }}" class="font-medium text-primary-600 hover:underline dark:text-primary-500">S'inscrire</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

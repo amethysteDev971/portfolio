@@ -1,33 +1,28 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/admin.html.twig' %}
 
 {% block title %}Hello PostsController!{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/app/src/Controller/Admin/PostsController.php</code></li>
-        <li>Your template at <code>/app/templates/admin/posts/index.html.twig</code></li>
-    </ul>
-</div>
-<div>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <h3>{{post.title}}</h3>
-                <p>{{post.shortDescription}}</p>
-                <p>{{post.longDescription}}</p>
-                <p>Publié : {{post.isPublished}}</p>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
+{% block main %}
+<section class="bg-white dark:bg-gray-900">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
+       
+        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Mais c'est qu'ils sont mignons <br>tout pleins vos posts !!!</h1>
+        <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le context et les rendre visibles au monde entier.</p>
+        
+    </div>
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-12 lg:px-12">
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <h3>{{post.title}}</h3>
+                    <p>{{post.shortDescription}}</p>
+                    <p>{{post.longDescription}}</p>
+                    <p>Publié : {{post.isPublished  ? 'Yes' : 'No'}}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+    
 
 {% endblock %}

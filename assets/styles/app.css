@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    background-color: skyblue;
+.w-32{
+    width: 8rem; /* 128px */
+}
+
+.h-32{
+    height: 8rem; /* 128px */
 }
