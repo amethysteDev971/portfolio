@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+#main_body {
+    height: 100vh !important; 
+     
+}
+
+main{
+    height: 100vh !important;
+}
 .w-32{
     width: 8rem; /* 128px */
 }
