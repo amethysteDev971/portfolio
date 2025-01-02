@@ -1,5 +1,17 @@
 # Portfolio Amethyste Design
 
+* Pour deployer un jeux de datas par défault :
+php bin/console doctrine:fixtures:load
+
+si necessaire
+Vérifiez que la structure de la table correspond bien à votre entité
+php bin/console doctrine:schema:validate 
+
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
+
+* solution tailwind encore en test
+
 root@dfcb4ae20363:/app# mkdir -p /app/var/tailwind/v3.4.17
 root@dfcb4ae20363:/app# curl -L https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-arm64 -o /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
