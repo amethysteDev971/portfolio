@@ -11,14 +11,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 class PhotoController extends AbstractController
 {
     #[Route('/admin/photo', name: 'app_photo')]
-    public function index(): Response
+    public function index(EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, UploaderHelper $helper): Response
     {
+        $photos = $em->getRepository(Photo::class)->findAll();
+        // dump($photos);
+        
+
         return $this->render('admin/photo/index.html.twig', [
             'controller_name' => 'PhotoController',
+            'photos' => $photos,
         ]);
     }
 
