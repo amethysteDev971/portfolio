@@ -18,11 +18,19 @@ class CustomNamerUploader implements NamerInterface
      */
     public function name(object $object, PropertyMapping $mapping): string
     {
-        // Ici, tu accèdes à l'objet (par exemple, à l'utilisateur associé à l'image)
-        $userId = $object->getUser()->getId();
-        
-        // Tu génères un nom unique pour le fichier
-        $file = $mapping->getFile($object); // Obtient le fichier via le PropertyMapping
-        return $userId . '/' . uniqid() . '.' . $file->guessExtension();
+        // Vérifie que l'objet a une méthode getUser et que l'utilisateur existe
+        if (!method_exists($object, 'getUser') || null === $object->getUser()) {
+            throw new \RuntimeException('L\'objet doit être associé à un utilisateur.');
+        }
+
+        // Récupère le fichier téléchargé
+        $file = $mapping->getFile($object);
+        if (!$file instanceof File) {
+            throw new \RuntimeException('Le fichier téléchargé est invalide.');
+        }
+
+        // Génére un nom unique pour le fichier
+        $extension = $file->guessExtension() ?? 'bin'; // Par défaut "bin" si aucune extension
+        return uniqid() . '.' . $extension; // Ne retourne que le nom du fichier
     }
 }

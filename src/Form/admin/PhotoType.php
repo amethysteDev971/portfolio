@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class PhotoType extends AbstractType
 {
@@ -19,8 +20,21 @@ class PhotoType extends AbstractType
             ->add('alt')
             ->add('description')
             ->add('imageFile', FileType::class, [
-                'required' => false,
                 'label' => 'Image',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/x-png',
+                            'image/png',
+                            'image/gif'
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (jpeg, png, gif).',
+                    ])
+                ],
             ])
             ->add('section', EntityType::class, [
                 'class' => Section::class,

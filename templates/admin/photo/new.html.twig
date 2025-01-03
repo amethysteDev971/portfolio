@@ -11,7 +11,7 @@
        
     </div>
     <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-12 lg:px-12">
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
             {{ form_widget(form) }}
         {{ form_end(form) }}
     </div>
