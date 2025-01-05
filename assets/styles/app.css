@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html{
+    height: 100vh;
+}
+
 #main_body {
     height: 100vh !important;   
 }
@@ -16,3 +20,50 @@ main{
 .h-32{
     height: 8rem; /* 128px */
 }
+
+/* fluid 5 columns */
+.grid-sizer,
+.grid-item{
+    width: 20%;
+    /* img {
+        width: 100%;
+    } */
+}
+
+/* 2 columns */
+.grid-item--width2 { width: 40%; }
+
+@media only screen and (max-width: 991px) {
+
+    /* fluid 3 columns */
+    .grid-sizer,
+    .grid-item{
+        width: 33%;
+    }
+}
+
+@media only screen and (max-width: 670px) {
+    
+    /* fluid 2 columns */
+    .grid-sizer,
+    .grid-item{
+        width: 50%;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    html{
+        width: 54vh;
+    }
+    section{
+        width: 100%;
+    }
+
+    /* fluid 1 columns */
+    .grid-sizer,
+    .grid-item{
+        width: 100%;
+    }
+}
+
+

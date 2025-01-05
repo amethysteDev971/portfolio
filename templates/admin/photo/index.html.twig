@@ -9,6 +9,9 @@
        
         <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Mais c'est qu'ils sont mignons <br>tout pleins vos posts !!!</h1>
         <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le context et les rendre visibles au monde entier.</p>
+        <div>
+            <a href="{{ path('app_photo_create') }}" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Nouvelle Upload</a>
+        </div>
         
     </div>
     <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-12 lg:px-12">
@@ -31,59 +34,20 @@
     </div>
 
 
-    <div class="mansory-grid">
+    <div class="grid_masonry">
         {% for photo in photos %}
-
-            <div class="mansory-grid-item">
-                <img src="{{vich_uploader_asset(photo, 'imageFile')}}" alt="{{photo.alt}}" class="w-full h-auto rounded-lg">
-            </div>
-            {# <div>
-                <img class="h-auto max-w-full rounded-lg" src="{{vich_uploader_asset(photo, 'imageFile')}}" alt="{{photo.alt}}">
-            </div> #}
-            {# <div>
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg" alt="">
-            </div>
-            <div>
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg" alt="">
-            </div> #}
-
+        <div class="grid-item"><img src="{{vich_uploader_asset(photo, 'imageFile')}}" alt="{{photo.alt}}" class=""></div>
         {% endfor %}
-            <div class="p-4">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg">
-            </div>
-            <div class="p-4">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg">
-            </div>
-            {# <div>
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg" alt="">
-            </div>
-            <div>
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg" alt="">
-            </div> #}
-
+        <!-- width of .grid-sizer used for columnWidth -->
+        <div class="grid-sizer"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg"></div>
+        <div class="grid-item grid-item--width2"></div>
     </div>
-{# 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    <!-- Image 1 -->
-
-    
-    <!-- Image 2 -->
-    <div class="bg-gray-200 p-4">
-        <img src="image2.jpg" alt="Image 2" class="w-full h-auto rounded-lg">
-    </div>
-    
-    <!-- Image 3 -->
-    <div class="bg-gray-200 p-4">
-        <img src="image3.jpg" alt="Image 3" class="w-full h-auto rounded-lg">
-    </div>
-    
-    <!-- Image 4 -->
-    <div class="bg-gray-200 p-4">
-        <img src="image4.jpg" alt="Image 4" class="w-full h-auto rounded-lg">
-    </div>
-    
-    <!-- Ajouter plus d'images au besoin -->
-    </div> #}
 
 </section>
 {% endblock %}

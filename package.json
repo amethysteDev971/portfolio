@@ -23,6 +23,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "flowbite": "^2.5.2"
+        "flowbite": "^2.5.2",
+        "masonry-layout": "^4.2.2"
     }
 }
