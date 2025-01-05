@@ -1,5 +1,6 @@
 # Portfolio Amethyste Design
-
+npm install 
+npm run dev
 
 # Symfony Docker
 

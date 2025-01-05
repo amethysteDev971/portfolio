@@ -50,7 +50,7 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    // require('./vendor/tales-from-a-dev/flowbite-bundle/plugin') // Plugin Flowbite depuis vendor
+    require('flowbite/plugin') // add the flowbite plugin
   ],
 }
 
