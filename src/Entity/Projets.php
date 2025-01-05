@@ -24,6 +24,9 @@ class Projets
     #[ORM\OneToMany(targetEntity: Section::class, mappedBy: 'projets', orphanRemoval: true)]
     private Collection $sections;
 
+    #[ORM\OneToOne(mappedBy: 'projet', cascade: ['persist', 'remove'])]
+    private ?Post $post = null;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -72,6 +75,28 @@ class Projets
                 $section->setProjets(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPost(): ?Post
+    {
+        return $this->post;
+    }
+
+    public function setPost(?Post $post): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($post === null && $this->post !== null) {
+            $this->post->setProjet(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($post !== null && $post->getProjet() !== $this) {
+            $post->setProjet($this);
+        }
+
+        $this->post = $post;
 
         return $this;
     }

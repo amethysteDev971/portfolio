@@ -1,0 +1,53 @@
+{% extends 'layout/admin.html.twig' %}
+
+{% block title %}Hello PhotoController!{% endblock %}
+
+{% block main %}
+
+<section class="bg-white dark:bg-gray-900">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
+       
+        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Mais c'est qu'ils sont mignons <br>tout pleins vos posts !!!</h1>
+        <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le context et les rendre visibles au monde entier.</p>
+        <div>
+            <a href="{{ path('app_photo_create') }}" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Nouvelle Upload</a>
+        </div>
+        
+    </div>
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-12 lg:px-12">
+        <ul>
+            {% for photo in photos %}
+                <li>
+                    <h3>alt : {{photo.alt}}</h3>
+                    <p>Id_User : {{photo.user.id}}</p>
+                    <p>Nom de l'image : {{photo.image.name}}</p>
+                    <p>Description : {{photo.description}}</p>
+                    <p>Url : {{vich_uploader_asset(photo, 'imageFile')}}</p>
+                    {# {% if photo.url %}
+                        <p>photoUrl : {{photo.url}}</p>
+                    {% else %}
+                        <p>Image non disponible.</p>
+                    {% endif %} #}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+    <div class="grid_masonry">
+        {% for photo in photos %}
+        <div class="grid-item"><img src="{{vich_uploader_asset(photo, 'imageFile')}}" alt="{{photo.alt}}" class=""></div>
+        {% endfor %}
+        <!-- width of .grid-sizer used for columnWidth -->
+        <div class="grid-sizer"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg"></div>
+        <div class="grid-item"><img src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg"></div>
+        <div class="grid-item grid-item--width2"></div>
+    </div>
+
+</section>
+{% endblock %}

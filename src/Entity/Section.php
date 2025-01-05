@@ -25,6 +25,7 @@ class Section
     private ?Projets $projets = null;
 
     #[ORM\OneToOne(inversedBy: 'section', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)] // nullable permet de ne pas exiger de lien obligatoire
     private ?Photo $photo = null;
 
     public function getId(): ?int

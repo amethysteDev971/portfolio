@@ -38,21 +38,6 @@
             "migrations/.gitignore"
         ]
     },
-    "symfony/asset-mapper": {
-        "version": "7.2",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "6.4",
-            "ref": "5ad1308aa756d58f999ffbe1540d1189f5d7d14a"
-        },
-        "files": [
-            "assets/app.js",
-            "assets/styles/app.css",
-            "config/packages/asset_mapper.yaml",
-            "importmap.php"
-        ]
-    },
     "symfony/console": {
         "version": "7.2",
         "recipe": {
@@ -203,8 +188,21 @@
             "config/routes/web_profiler.yaml"
         ]
     },
-    "symfonycasts/tailwind-bundle": {
-        "version": "v0.6.1"
+    "symfony/webpack-encore-bundle": {
+        "version": "2.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "35ee1edee91a1a7137095f53db7ed0c20884b745"
+        },
+        "files": [
+            "assets/app.js",
+            "assets/styles/app.css",
+            "config/packages/webpack_encore.yaml",
+            "package.json",
+            "webpack.config.js"
+        ]
     },
     "symfonycasts/verify-email-bundle": {
         "version": "v1.17.3"
@@ -229,5 +227,17 @@
     },
     "twig/extra-bundle": {
         "version": "v3.17.0"
+    },
+    "vich/uploader-bundle": {
+        "version": "2.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.13",
+            "ref": "1b3064c2f6b255c2bc2f56461aaeb76b11e07e36"
+        },
+        "files": [
+            "config/packages/vich_uploader.yaml"
+        ]
     }
 }

@@ -11,26 +11,9 @@ php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 
 * solution tailwind encore en test
-
-root@dfcb4ae20363:/app# mkdir -p /app/var/tailwind/v3.4.17
-root@dfcb4ae20363:/app# curl -L https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-arm64 -o /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
-100 38.6M  100 38.6M    0     0   619k      0  0:01:03  0:01:03 --:--:-- 1685k
-root@dfcb4ae20363:/app# ls -l /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
--rw-r--r-- 1 root root 40525732 Dec 30 16:13 /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
-root@dfcb4ae20363:/app# chmod +x /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
-root@dfcb4ae20363:/app# ls -l /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
--rwxr-xr-x 1 root root 40525732 Dec 30 16:13 /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64
-root@dfcb4ae20363:/app# /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64 --help
-
-
-mv /app/var/tailwind/v3.4.17/tailwindcss-linux-arm64 tailwindcss
-root@dfcb4ae20363:/app# php bin/console tailwind:build 
-
-root@7963163b3dbc:/app# php bin/console asset-map:compile
-
+npm install 
+npm run dev
+npm run watch
 
 # Symfony Docker
 
