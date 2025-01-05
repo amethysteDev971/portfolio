@@ -1,0 +1,26 @@
+{
+    "app": {
+        "path": "\/assets\/app-S1nFoBu.js",
+        "type": "js"
+    },
+    "\/assets\/styles\/app.css": {
+        "path": "\/assets\/styles\/app-MkdMlkh.css",
+        "type": "css"
+    },
+    "flowbite": {
+        "path": "\/assets\/vendor\/flowbite\/flowbite.index-FRy412V.js",
+        "type": "js"
+    },
+    "@popperjs\/core": {
+        "path": "\/assets\/vendor\/@popperjs\/core\/core.index-ZE0xRfu.js",
+        "type": "js"
+    },
+    "flowbite-datepicker": {
+        "path": "\/assets\/vendor\/flowbite-datepicker\/flowbite-datepicker.index-Yeh5Zdr.js",
+        "type": "js"
+    },
+    "flowbite\/dist\/flowbite.min.css": {
+        "path": "\/assets\/vendor\/flowbite\/dist\/flowbite.min-McAl-fZ.css",
+        "type": "css"
+    }
+}

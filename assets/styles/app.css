@@ -2,9 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
 #main_body {
-    height: 100vh !important;     
+    height: 100vh !important;   
 }
 
 main{
@@ -16,11 +15,4 @@ main{
 
 .h-32{
     height: 8rem; /* 128px */
-}
-
-.mansory-grid-item{
-    float: left;
-    width: 80px;
-    height: 60px;
-    border: 2px solid salmon;
 }
