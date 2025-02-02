@@ -20,11 +20,11 @@ class Section
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sections')]
+    #[ORM\ManyToOne(targetEntity: Projets::class, inversedBy: 'sections')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Projets $projets = null;
 
-    #[ORM\OneToOne(inversedBy: 'section', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'section', cascade: ['persist', 'remove'], fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true)] // nullable permet de ne pas exiger de lien obligatoire
     private ?Photo $photo = null;
 

@@ -16,7 +16,7 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 class PhotoController extends AbstractController
 {
-    #[Route('/admin/photo', name: 'app_photo')]
+    #[Route('/admin/photo', name: 'app_admin_photo')]
     public function index(EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, UploaderHelper $helper): Response
     {
         $photos = $em->getRepository(Photo::class)->findAll();
@@ -29,13 +29,13 @@ class PhotoController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/photo/create', name: 'app_photo_create')]
+    #[Route('/admin/photo/create', name: 'app_admin_photo_create')]
     public function create(EntityManagerInterface $em, Request $request, Security $security): Response
     {
 
         $photo = new Photo();
         $form = $this->createForm(PhotoType::class, $photo,[
-            'action' => $this->generateUrl('app_photo_create'),
+            'action' => $this->generateUrl('app_admin_photo_create'),
             'method' => 'POST',
         ]);
         $form->handleRequest($request);
@@ -56,7 +56,7 @@ class PhotoController extends AbstractController
             $em->persist($photo);
             $em->flush();
     
-            return $this->redirectToRoute('app_photo');
+            return $this->redirectToRoute('app_admin_photo');
         }
     
         

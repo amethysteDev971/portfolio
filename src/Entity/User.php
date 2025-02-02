@@ -44,9 +44,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Photo::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $photos;
 
+    /**
+     * @var Collection<int, Projets>
+     */
+    #[ORM\OneToMany(targetEntity: Projets::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $projet;
+
     public function __construct()
     {
         $this->photos = new ArrayCollection();
+        $this->projet = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,6 +167,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($photo->getUser() === $this) {
                 $photo->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Projets>
+     */
+    public function getProjet(): Collection
+    {
+        return $this->projet;
+    }
+
+    public function addProjet(Projets $projet): static
+    {
+        if (!$this->projet->contains($projet)) {
+            $this->projet->add($projet);
+            $projet->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjet(Projets $projet): static
+    {
+        if ($this->projet->removeElement($projet)) {
+            // set the owning side to null (unless already changed)
+            if ($projet->getUser() === $this) {
+                $projet->setUser(null);
             }
         }
 

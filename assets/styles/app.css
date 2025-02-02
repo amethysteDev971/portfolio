@@ -21,6 +21,33 @@ main{
     height: 8rem; /* 128px */
 }
 
+.align-items_center{
+    align-items: center;
+}
+
+.py-4{
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.py-2{
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.drag-drop{
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
+}
+
+.container-sections{
+    max-width: 1400px;
+    width: 990px;  
+}
+
+
 /* fluid 5 columns */
 .grid-sizer,
 .grid-item{
@@ -29,6 +56,14 @@ main{
         width: 100%;
     } */
 }
+
+.m-4{
+    margin: 1rem;
+}
+
+.mb-4{
+    margin-bottom: 1rem;
+}	
 
 /* 2 columns */
 .grid-item--width2 { width: 40%; }

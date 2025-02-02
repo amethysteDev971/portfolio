@@ -1,0 +1,43 @@
+{% extends 'layout/admin.html.twig' %}
+
+{% block title %}Hello ProjetController!{% endblock %}
+
+{% block main %}
+<section class="bg-white dark:bg-gray-900">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
+       
+        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Mais c'est qu'ils sont mignons <br>tout pleins vos projets !!!</h1>
+        <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le context et les rendre visibles au monde entier.</p>
+        
+    </div>
+
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-12 lg:px-12">
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+            {# {{ form_widget(form) }}
+            {% if form.currentImagePath.vars.data %}
+                <div>
+                    <label>Image actuelle :</label>
+                    <img src="{{ asset(form.currentImagePath.vars.data) }}" alt="Image actuelle" style="max-width: 200px; max-height: 200px;">
+                </div>
+            {% endif %} #}
+            {# {{ form_row(form.title) }} #}
+            {{ form_row(form.title) }}
+            {{ form_row(form.description) }}
+            
+            {# Prévisualisation de l'image existante #}
+            {% if form.currentImagePath.vars.data %}
+                <div>
+                    <label>Image actuelle :</label>
+                    <img src="{{ asset(form.currentImagePath.vars.data) }}" alt="Image actuelle" style="max-width: 200px; max-height: 200px;">
+                </div>
+            {% endif %}
+
+            {# Champ pour uploader une nouvelle image #}
+            {{ form_row(form.imageFile) }}
+
+            <button type="submit">Enregistrer</button>
+        {{ form_end(form) }}
+            </div>
+   
+</section>
+{% endblock %}

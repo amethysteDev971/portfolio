@@ -44,9 +44,6 @@ class Post
     #[ORM\Column]
     private ?bool $isPublished = null;
 
-    #[ORM\OneToOne(inversedBy: 'post', cascade: ['persist', 'remove'])]
-    private ?Projets $projet = null;
-
     public function __construct()
     {
         $this->tags = new ArrayCollection();
@@ -165,15 +162,4 @@ class Post
         return $this;
     }
 
-    public function getProjet(): ?Projets
-    {
-        return $this->projet;
-    }
-
-    public function setProjet(?Projets $projet): static
-    {
-        $this->projet = $projet;
-
-        return $this;
-    }
 }

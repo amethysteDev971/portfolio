@@ -1,0 +1,44 @@
+{% extends 'layout/admin.html.twig' %}
+
+{% block title %}Hello SectionController!{% endblock %}
+
+{% block main %}
+<section class="bg-white dark:bg-gray-900">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
+       
+        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Mais c'est qu'ils sont mignons <br>tout pleins vos posts !!!</h1>
+        <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le context et les rendre visibles au monde entier.</p>
+        <div>
+            <a href="{{ path('app_admin_section_create') }}" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"> + Ajouter une Section</a>
+        </div>
+        
+    </div>
+   
+    <div class="flex justify-center">
+        <div class="container-sections border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 m-4 p-4">
+            <ul id="section-list">
+            {% for section in sections %}
+                <li data-id="{{section.id}}">
+                    {# <h1 class="text-4xl">Section {{section.rangePosition}}</h1> #}
+                    {# <h3>Post</h3>
+                    <p>post title : {{section.projets.post.title}}</p> #}
+
+                    <h3>Projet</h3>
+                    <p>#ID : {{section.id}}</p>
+                    <p>range_position : {{section.rangePosition}}</p>
+                    <p>titre : {{section.projets.title}}</p>
+
+                    <h3>Section</h3>
+                    <p>description : {{section.description}}</p>
+
+                    <h3>Photo</h3>
+                    <p>Url : {{vich_uploader_asset(section.photo, 'imageFile')}}</p>
+                    <div class=""><img src="{{vich_uploader_asset(section.photo, 'imageFile')}}" alt="{{section.photo.alt}}" class=""></div>
+                </li>    
+            {% endfor %}            
+            </ul>
+        </div>
+    </div>
+
+</section>
+{% endblock %}

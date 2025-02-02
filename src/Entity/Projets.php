@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ProjetsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjetsRepository::class)]
@@ -21,11 +22,18 @@ class Projets
     /**
      * @var Collection<int, Section>
      */
-    #[ORM\OneToMany(targetEntity: Section::class, mappedBy: 'projets', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'projets', targetEntity: Section::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $sections;
 
-    #[ORM\OneToOne(mappedBy: 'projet', cascade: ['persist', 'remove'])]
-    private ?Post $post = null;
+    #[ORM\ManyToOne(inversedBy: 'projet')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options:["default" => "CURRENT_TIMESTAMP"])]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options:["default" => "CURRENT_TIMESTAMP"])]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function __construct()
     {
@@ -79,25 +87,40 @@ class Projets
         return $this;
     }
 
-    public function getPost(): ?Post
+    public function getUser(): ?User
     {
-        return $this->post;
+        return $this->user;
     }
 
-    public function setPost(?Post $post): static
+    public function setUser(?User $user): static
     {
-        // unset the owning side of the relation if necessary
-        if ($post === null && $this->post !== null) {
-            $this->post->setProjet(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($post !== null && $post->getProjet() !== $this) {
-            $post->setProjet($this);
-        }
-
-        $this->post = $post;
+        $this->user = $user;
 
         return $this;
     }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
 }

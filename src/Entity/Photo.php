@@ -59,7 +59,7 @@ class Photo
 
     public function getPath(): ?string
     {
-        return $this->path;
+        return str_replace('public/', '', $this->path);
     }
 
     public function setPath(string $path): static
