@@ -11,11 +11,18 @@ import './styles/app.css';
 // enable the interactive UI components from Flowbite
 import 'flowbite';
 import { Modal } from 'flowbite';
-import { Dropdown } from 'flowbite'
+import { Dropdown } from 'flowbite';
 // import { initFlowbite } from 'flowbite';
 
 // Importation de Masonry
 import Masonry from 'masonry-layout';
+import './modal.js'; // Import the updated modal handling script
+
+
+
+import SortableUtil from './sortable_util.js';
+ // Create an instance of SortableUtil and call initSortable
+ const sortableUtil = new SortableUtil();
 
 // Initialisation de Masonry sur un conteneur spécifique
 document.addEventListener("DOMContentLoaded", function() {
@@ -33,54 +40,88 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
+  
+
   //** */ Flowbite elements init functions
   // initFlowbite();
   initDropdowns();
 
-    // set the modal menu element
-    const $targetEl = document.getElementById('control-modal');
-
-    // // options with default values
-    const options = {
-      placement: 'bottom-right',
-      backdrop: 'dynamic',
-      backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
-      closable: true,
-      onHide: () => {
-          console.log('modal is hidden');
-          //Mise à jour page reload
-          window.location.reload();
-      },
-      onShow: () => {
-          console.log('modal is shown');
-      },
-      onToggle: () => {
-          console.log('modal has been toggled');
-      }
-    };
-
-  /*
-  * $targetEl: required
-  * options: optional
-  */
-  const modal = new Modal($targetEl, options);
-  console.log(modal);
+  const $targetEl = document.getElementById('control-modal');
   
+  const options = {
+    placement: 'bottom-right',
+    backdrop: 'dynamic',
+    backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
+    closable: true,
+    onHide: () => {
+      console.log('modal is hidden');
+      // Mise à jour page reload
+      window.location.reload();
+    },
+    onShow: () => {
+      console.log('modal is shown');
+    },
+    onToggle: () => {
+      console.log('modal has been toggled');
+    }
+  };
+  const modal = new Modal($targetEl, options);
+  console.log('Modal instance:', modal);
+
+  const loadModalContent = (projectId, action) => {
+    const modalContent = document.querySelector('#control-modal .modal-content');
+    if (!modalContent) {
+      console.error('Modal content element not found');
+      return;
+    }
+    const url = `/admin/projet/modal/${projectId}/${action}`;
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            console.log('Loaded HTML:', html); // Log the loaded HTML
+            modalContent.innerHTML = html;
+            console.log('Modal content updated');
+            modal.show();
+            console.log('Modal should be shown now');
+            hundleForceCloseModal();
+            // Vérifier les classes CSS
+            console.log('Modal classes:', $targetEl.classList);
+            sortableUtil.initSortable();
+        })
+        .catch(error => console.error('Error loading modal content:', error));
+  };
 
   document.querySelectorAll('#dropdownMenuEdit a').forEach(function (element) {
     element.addEventListener('click', function (event) {
       event.preventDefault();
-      const action = this.dataset.action;
-      if (action === 'reorganize') {
-        modal.show();
-      } else if (action === 'add-section') {
-        // Add your logic for adding a section here
-        alert('Ajouter une section clicked');
-      }
-
+      const action = this.getAttribute('data-action');
+      const projectId = document.querySelector('#project-id').value; // Assurez-vous que l'ID du projet est disponible
+      loadModalContent(projectId, action);
     });
-
   });
+
+  function hundleForceCloseModal() {
+    // const buttonToHide = document.querySelector('button[data-modal-hide = control-modal]');
+    // console.log('buttonToHide =>', buttonToHide);
+    document.querySelectorAll('button[data-modal-hide = control-modal]').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        modal.hide();
+      });
+    });
+    
+    
+  }
+
+ 
+  // Sortable.js
+  if (typeof sortableUtil.initSortable === 'function') {
+    sortableUtil.initSortable();
+  } else {
+    console.error('initSortable is not a function in sortableUtil');
+  }
   
 
 });
@@ -90,4 +131,5 @@ window.onresize = () => {
 }
 
 console.log('app.js loaded');
+
 

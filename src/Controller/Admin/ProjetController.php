@@ -8,13 +8,17 @@ use App\Entity\Projets;
 use App\Entity\Section;
 use App\Form\admin\PhotoType;
 use App\Form\admin\ProjetType;
+use App\Form\admin\SectionByProjectType;
+use App\Form\admin\SectionPhotoType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+
 use Doctrine\Persistence\Proxy;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProjetController extends AbstractController
 {
@@ -192,26 +196,169 @@ class ProjetController extends AbstractController
     #[Route('admin/projet/show/{id}', name: 'app_admin_projet_show')]
     public function showProjet(EntityManagerInterface $em, Request $request, $id, SectionsServices $sectionsServices): Response
     {
+        // Récupérer le projet par son ID
         $projet = $em->getRepository(Projets::class)->find($id);
+
+        // Vérifier si le projet existe
         if (!$projet) {
             throw $this->createNotFoundException('Projet non trouvé');
         }
 
+        // Convertir la collection en tableau
         $sections = $projet->getSections();
         $sectionsArray = $sections->toArray();
+
+        // Trier le tableau
         usort($sectionsArray, array($sectionsServices, 'asortSectionByRangePosition'));
 
-        // Clear existing sections and add sorted sections back
+        // Vider les sections existantes et ajouter les nouvelles sections triées
         $projet->getSections()->clear();
         foreach ($sectionsArray as $section) {
             $projet->addSection($section);
         }
 
+        // Rendre la vue show.html.twig avec les informations du projet
         return $this->render('admin/projet/show.html.twig', [
             'controller_name' => 'Projet ' . $projet->getTitle(),
             'projet' => $projet,
             'sections' => $sectionsArray,
         ]);
+    }
+
+    #[Route('admin/projet/list/{id}', name: 'admin_sections_list')]
+    public function sectionsList(EntityManagerInterface $em, $id): Response
+    {
+        $projet = $em->getRepository(Projets::class)->find($id);
+
+        if (!$projet) {
+            throw $this->createNotFoundException('Projet non trouvé');
+        }
+
+        $sections = $projet->getSections();
+
+        return $this->render('admin/sections/list.html.twig', [
+            'sections' => $sections,
+            'projet' => $projet,
+        ]);
+    }
+
+    #[Route('/admin/projet/form', name: 'admin_section_form')]
+    public function sectionForm(): Response
+    {
+        // Logique pour afficher le formulaire d'ajout de section
+        return $this->render('admin/projet/sections_form.html.twig');
+    }
+
+    #[Route('admin/projet/modal/{id}/{action}', name: 'admin_projet_modal')]
+    public function loadModalContent(EntityManagerInterface $em, $id, $action, 
+                                    SectionsServices $sectionsServices, Request $request,
+                                    Security $security): Response
+    {
+        try {
+            // Récupérer le projet par son ID
+            $projet = $em->getRepository(Projets::class)->find($id);
+            $sections = $projet->getSections();
+            $sectionsArray = $sections->toArray();
+
+            // Vérifier si le projet existe
+            if (!$projet) {
+                throw $this->createNotFoundException('Projet non trouvé');
+            }
+
+            if ($action ==='add_section') {
+               // Convertir la collection en tableau
+                
+                
+
+                // Trier le tableau
+                usort($sectionsArray, array($sectionsServices, 'asortSectionByRangePosition')); 
+            }
+            
+
+            //Pour le formulaire Add section
+            if ($action ==='add_section') {
+                $section = new Section();
+                $form = $this->createForm(SectionByProjectType::class, $section,[
+                    'action' => $this->generateUrl('admin_projet_modal',[
+                        'id' => $projet->getId(),
+                        'action' => 'add_section'
+                    ]),
+                    'method' => 'POST',
+                ]);
+                $form->handleRequest($request);
+                if ($form->isSubmitted() && $form->isValid()) {
+                    // Récupérer les données non mappées pour la photo
+                    $alt = $form->get('alt')->getData();
+                    $description = $form->get('description_photo')->getData();
+                    $imageFile = $form->get('imageFile')->getData();
+                    // dump($imageFile);
+                    // exit();
+                    if ($imageFile) {
+                        // Gérer l'upload de l'image
+                        // $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                        // $imageFile->move($this->getParameter('uploads_directory'), $newFilename);
+            
+                        // Créer une nouvelle entité Photo
+                        $photo = new Photo();
+                        $photo->setAlt($alt);
+                        $photo->setDescription($description);
+                        $photo->setImageFile($form->get('imageFile')->getData());
+                        // $photo->setPath($newFilename);
+                        $photo->setMimeType($imageFile->getClientMimeType());
+                        $photo->setSize($imageFile->getSize());
+                        $photo->setUser($security->getUser());
+                        $newFilename = 'public/uploads/photos'.'/'.$photo->getUser()->getId().'/'.uniqid() . '.' . $imageFile->guessExtension();
+                        $photo->setPath($newFilename);
+            
+                        // Associer la photo à la section
+                        $section->setPhoto($photo);
+                        //persiter range_positions
+                        $section->setRangePosition($sectionsServices->getLastRangePosition($sectionsArray)+1);
+                        $section->setProjets($projet);
+
+                        // dump($photo);
+                        // dump(uniqid());
+                        // dump($photo->getUser()->getId());
+                        // exit();
+        
+                        //Persister la photo
+                        $em->persist($photo);
+                        
+                    }
+                    // dump($section);
+                    // exit();
+                    // Persister la section
+                    $em->persist($section);
+                    $em->flush();
+                    return $this->redirectToRoute('app_admin_projet_show',[
+                        'id' => $projet->getId()
+                    ]);
+                }//fin du if formulaire
+            }
+
+
+            // Rendre le contenu approprié en fonction de l'action
+            switch ($action) {
+                case 'reorganize':
+                    return $this->render('admin/projet/sections_list.html.twig', [
+                        'projet' => $projet,
+                        'sections' => $sectionsArray,
+                        'action' => $action,
+                    ]);
+                case 'add_section':
+                    // dump($projet);
+                    // exit();
+                    return $this->render('admin/projet/section_form.html.twig', [
+                        'projet' => $projet,
+                        'action' => $action,
+                        'form' => $form,
+                    ]);
+                default:
+                    throw new \Exception('Action non reconnue action reçue = '.$action);
+            }
+        } catch (\Exception $e) {
+            return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
     }
 
 }

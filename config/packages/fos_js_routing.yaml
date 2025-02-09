@@ -1,0 +1,4 @@
+# fos_js_routing:
+#     routes_to_expose: 
+#         - admin_sections_list
+        # Add any other routes you need to expose

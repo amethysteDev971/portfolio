@@ -1,6 +1,9 @@
 {% extends 'layout/base_layout.html.twig' %}
 {% block body %}
 {# flowbite #}
+
+{# Gestion menu #}
+{% set currentPath = app.request.pathinfo %}
 <div class="antialiased bg-gray-50 dark:bg-gray-900">
     <nav class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
       <div class="flex flex-wrap justify-between items-center">
@@ -799,6 +802,57 @@
             <button
               type="button"
               class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              aria-controls="dropdown-projets"
+              data-collapse-toggle="dropdown-projets"
+            >
+              <svg
+                aria-hidden="true"
+                class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill-rule="evenodd"
+                  d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                  clip-rule="evenodd"></path>
+              </svg>
+              <span class="flex-1 ml-3 text-left whitespace-nowrap">
+                projets
+              </span>
+              <svg
+                aria-hidden="true"
+                class="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </button>
+            
+            <ul id="dropdown-projets" class="{{ currentPath starts with '/admin/projet' ? '' : 'hidden' }} py-2 space-y-2">
+              <li>
+                <a href="{{ path('app_admin_projet_list') }}"
+                  class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                  Liste des projets
+                </a>
+              </li>
+              <li>
+                <a href="{{ path('app_admin_projet_create') }}"
+                  class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                  Créer un projet
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <button
+              type="button"
+              class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               aria-controls="dropdown-pages"
               data-collapse-toggle="dropdown-pages"
             >
@@ -816,7 +870,7 @@
                 ></path>
               </svg>
               <span class="flex-1 ml-3 text-left whitespace-nowrap"
-                >Vos posts</span
+                >posts</span
               >
               <svg
                 aria-hidden="true"
@@ -832,7 +886,8 @@
                 ></path>
               </svg>
             </button>
-            <ul id="dropdown-pages" class="hidden py-2 space-y-2">
+            
+            <ul id="dropdown-pages" class="{{ currentPath starts with '/admin/posts' ? '' : 'hidden' }} py-2 space-y-2">
               <li>
 
               {# <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="{{ path('app_admin_posts') }}">Creer des posts</a> #}
@@ -847,13 +902,6 @@
                   href="{{ path('app_admin_posts_create') }}"
                   class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   >Créer un post</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >Calendar</a
                 >
               </li>
             </ul>
@@ -1343,9 +1391,10 @@
 
     <main class="p-4 md:ml-64 h-auto pt-20">
         {% block main %}{% endblock %}
+        {% block modal %}{% endblock %}
     </main>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+{# <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
     const list = document.getElementById('section-list');
     console.log('list => ',list);
@@ -1369,5 +1418,5 @@
             });
         }
     });
-</script>
+</script> #}
 {% endblock %}

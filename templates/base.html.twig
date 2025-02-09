@@ -8,13 +8,13 @@
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
-
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
     </head>
     <body id="main_body">
         {% block body %}{% endblock %}
+        {% include 'admin/projet/modal.html.twig' %}
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
         {% block javascripts_bottom %}{% endblock %}
     </body>
 </html>

@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Photo;
+use App\Entity\Projets;
 use App\Entity\Section;
 use App\Form\admin\SectionPhotoType;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -29,12 +30,21 @@ class SectionController extends AbstractController
                         LoggerInterface $logger,
                         SectionsServices $sectionsServices): Response
     {
+
+        //Sections par projets
+        $projets = $em->getRepository(Projets::class)->findAll();
+        // foreach ($projets as $key => $value) {
+        //     dump($value);
+        // }
+
         // $logger->info('Test log: ceci est un test');
         // $logDir = $kernel->getLogDir();
         // dump($logDir); // Affiche le chemin du dossier de logs
         // exit;
         $sections = $em->getRepository(Section::class)->findAll();
+        
         // dump($sections);
+        // exit();
         $clones = [];
         for ($i=0; $i < count($sections); $i++) { 
             if ($sections[$i]->getRangePosition()) {
@@ -54,13 +64,54 @@ class SectionController extends AbstractController
         return $this->render('admin/section/index.html.twig', [
             'controller_name' => 'SectionController',
             'sections' => $sections,
+            'projets' => $projets
+        ]);
+    }
+
+    #[Route('admin/section/show/{id}', name: 'app_admin_section_show')]
+    public function show(EntityManagerInterface $em, 
+                        UrlGeneratorInterface $urlGenerator, 
+                        UploaderHelper $helper, 
+                        KernelInterface $kernel, 
+                        LoggerInterface $logger,
+                        SectionsServices $sectionsServices, 
+                        $id): Response
+    {
+        $section = $em->getRepository(Section::class)->find($id);
+        // dump($section);
+        // exit();
+        // Rendre la vue show.html.twig avec les informations du projet
+        return $this->render('admin/section/show.html.twig', [
+            'controller_name' => 'Section ' ,
+            'section' => $section,
+            // 'sections' => $sectionsArray,
+        ]);
+    }
+
+    #[Route('admin/section/update/{id}', name: 'app_admin_section_update')]
+    public function update(EntityManagerInterface $em, 
+                        UrlGeneratorInterface $urlGenerator, 
+                        UploaderHelper $helper, 
+                        KernelInterface $kernel, 
+                        LoggerInterface $logger,
+                        SectionsServices $sectionsServices, 
+                        $id): Response
+    {
+        $section = $em->getRepository(Section::class)->find($id);
+        // dump($section);
+        // exit();
+        // Rendre la vue show.html.twig avec les informations du projet
+        return $this->render('admin/section/update.html.twig', [
+            'controller_name' => 'Section ' ,
+            'section' => $section,
+            // 'sections' => $sectionsArray,
         ]);
     }
 
     static function asort_util ($a, $b) {
         if ($a->getRangePosition() == $b->getRangePosition()) return 0;
         return ($a->getRangePosition() < $b->getRangePosition()) ? -1 : 1;
-      }
+    }
 
     #[Route('/admin/section/create', name: 'app_admin_section_create')]
     public function create(EntityManagerInterface $em, Request $request, Security $security): Response
@@ -167,5 +218,19 @@ class SectionController extends AbstractController
         $logger->info('Database changes saved successfully.');
         return new JsonResponse(['success' => true]);
     }
+
+    // #[Route('/admin/sections/list', name: 'admin_sections_list')]
+    // public function sectionsList(): Response
+    // {
+    //     // Your logic to list sections
+    //     return new Response('Sections list');
+    // }
+
+    // #[Route('/admin/section/form', name: 'admin_section_form')]
+    // public function sectionForm(): Response
+    // {
+    //     // Your logic to show the section form
+    //     return new Response('Section form');
+    // }
 
 }
