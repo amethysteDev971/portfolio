@@ -25,6 +25,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "cropperjs": "^1.6.2",
         "flowbite": "^2.5.2",
         "masonry-layout": "^4.2.2",
         "sortablejs": "^1.15.6"

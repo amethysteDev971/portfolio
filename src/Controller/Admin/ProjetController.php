@@ -217,6 +217,9 @@ class ProjetController extends AbstractController
             $projet->addSection($section);
         }
 
+        // dump(phpinfo());
+        // exit();
+
         // Rendre la vue show.html.twig avec les informations du projet
         return $this->render('admin/projet/show.html.twig', [
             'controller_name' => 'Projet ' . $projet->getTitle(),

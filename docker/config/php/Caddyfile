@@ -1,0 +1,8 @@
+localhost {
+    root * /app/public
+    encode gzip
+
+    tls internal
+    php_fastcgi php:9000
+    file_server
+}
