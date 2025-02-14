@@ -34,6 +34,9 @@ main{
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 }
+.items-start{
+    align-items: start;
+}
 
 .drag-drop{
     cursor: move;
@@ -99,6 +102,63 @@ main{
     .grid-item{
         width: 100%;
     }
+}
+
+#flowbite_area {
+    text-align: center;
+}
+
+.img-container {
+    width: 200px; /* Définissez la largeur souhaitée */
+    max-width: 100%; /* Assurez la réactivité */
+    overflow: hidden; /* Cache les parties débordantes */
+}
+
+.img-container img {
+    width: 100%; /* L'image occupe toute la largeur du conteneur */
+    height: auto; /* Hauteur proportionnelle */
+}
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-container img {
+    display: block;
+    transition: filter 0.3s ease;
+}
+
+.image-container .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Couleur de fond semi-transparente */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-container:hover img {
+    filter: brightness(0.7); /* Rend l'image plus sombre */
+    
+}
+.image-container:hover{
+    cursor: pointer;
+}
+
+.image-container:hover .overlay {
+    opacity: 1;
+}
+
+.overlay-text {
+    color: white;
+    font-size: 1.5em;
+    text-align: center;
 }
 
 

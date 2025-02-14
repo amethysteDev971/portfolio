@@ -35,6 +35,10 @@ class Projets
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options:["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $updatedAt = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Photo $coverPhoto = null;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -123,4 +127,20 @@ class Projets
         return $this;
     }
 
+    public function getCoverPhoto(): ?Photo
+    {
+        return $this->coverPhoto;
+    }
+
+    public function setCoverPhoto(?Photo $coverPhoto): static
+    {
+        if ($coverPhoto !== null) {
+            $coverPhoto->setProjet($this);
+        }
+
+        $this->coverPhoto = $coverPhoto;
+        return $this;
+    }
+
 }
+

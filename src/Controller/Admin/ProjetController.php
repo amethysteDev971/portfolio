@@ -2,15 +2,19 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\BaseController;
 use App\Core\Service\SectionsServices;
 use App\Entity\Photo;
 use App\Entity\Projets;
 use App\Entity\Section;
+use App\Entity\User;
 use App\Form\admin\PhotoType;
 use App\Form\admin\ProjetType;
 use App\Form\admin\SectionByProjectType;
 use App\Form\admin\SectionPhotoType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -18,10 +22,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Persistence\Proxy;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
+use Vich\UploaderBundle\Storage\StorageInterface;
 
-class ProjetController extends AbstractController
+class ProjetController extends BaseController
 {
+    private $storage;
+    private $propertyMappingFactory;
+
+    public function __construct(StorageInterface $storage, PropertyMappingFactory $propertyMappingFactory)
+    {
+        $this->storage = $storage;
+        $this->propertyMappingFactory = $propertyMappingFactory;    
+    }
+
     #[Route('admin/projet', name: 'app_admin_projet_list')]
     public function index(EntityManagerInterface $em): Response
     {
@@ -218,6 +234,7 @@ class ProjetController extends AbstractController
         }
 
         // dump(phpinfo());
+        // dump($projet);
         // exit();
 
         // Rendre la vue show.html.twig avec les informations du projet
@@ -361,6 +378,96 @@ class ProjetController extends AbstractController
             }
         } catch (\Exception $e) {
             return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    #[Route('/upload-cropped-image', name: 'upload_cropped_image', methods: ['POST'])]
+    public function uploadCroppedImage(Request $request, EntityManagerInterface $em, Security $security,LoggerInterface $logger): JsonResponse
+    {
+        $projetId = $request->get('projet_id');
+        $uploadedFile = $request->files->get('croppedImage');
+
+        if (!$uploadedFile instanceof UploadedFile) {
+            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $projet = $em->getRepository(Projets::class)->find($projetId);
+
+        if (!$projet) {
+            return new JsonResponse(['error' => 'Project not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $user = $security->getUser();
+        if ($user instanceof User) {
+            // Créer une nouvelle entité Photo pour la couverture du projet
+            $photo = new Photo();
+            $photo->setUser($user);
+            $photo->setImageFile($uploadedFile);
+            $photo->setAlt('Cover image for project ' . $projet->getTitle());
+            $photo->setDescription('Cover image uploaded for the project');
+
+            // Associer cette photo comme couverture du projet
+            $projet->setCoverPhoto($photo);
+
+            // Persister la photo et le projet
+            $em->persist($photo);
+            $em->persist($projet);
+            $em->flush();
+
+            // Obtenir l'URL publique du fichier téléchargé
+            $fileUrl = $this->storage->resolveUri($photo, 'imageFile');
+
+            return new JsonResponse(['url' => $fileUrl]);
+        } else {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+    }
+
+    #[Route('/upload-cropped-image-update', name: 'upload_cropped_image_update', methods: ['POST'])]
+    public function updateUploadCroppedImage(Request $request, EntityManagerInterface $em, Security $security,LoggerInterface $logger,PropertyMappingFactory $propertyMappingFactory): JsonResponse
+    {
+        $projetId = $request->get('projet_id');
+        $uploadedFile = $request->files->get('croppedImage');
+
+        if (!$uploadedFile instanceof UploadedFile) {
+            return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $projet = $em->getRepository(Projets::class)->find($projetId);
+
+        if (!$projet) {
+            return new JsonResponse(['error' => 'Project not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $user = $security->getUser();
+        if ($user instanceof User) {
+            // Créer une nouvelle entité Photo pour la couverture du projet
+            $photo = $projet->getCoverPhoto();
+            if (!$photo) {
+                $photo = new Photo();
+                $photo->setUser($user);
+                $projet->setCoverPhoto($photo);
+                $em->persist($photo);
+            }else{
+                // Retrieve the PropertyMapping for the 'imageFile' field
+                $mapping = $this->propertyMappingFactory->fromField($photo, 'imageFile');
+                // Supprimer l'ancien fichier
+                $this->storage->remove($photo, $mapping);
+            }
+            $photo->setImageFile($uploadedFile);
+            $photo->setAlt('Cover image for project ' . $projet->getTitle());
+            $photo->setDescription('Cover image uploaded for the project');             
+
+            // Persister le projet
+            $em->persist($projet);
+            $em->flush();
+
+            // Obtenir l'URL publique du fichier téléchargé
+            $fileUrl = $this->storage->resolveUri($photo, 'imageFile');
+
+            return new JsonResponse(['url' => $fileUrl]);
+        } else {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
         }
     }
 

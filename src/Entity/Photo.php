@@ -21,9 +21,18 @@ class Photo
     #[ORM\Column]
     private ?int $id = null;
 
+    // #[Vich\UploadableField(mapping: 'photos', fileNameProperty: 'path', size: 'image.size')]
+    /**
+     * @Vich\UploadableField(mapping="photos", fileNameProperty="image.name", size="image.size")
+     * @var File|null
+     */
     #[Vich\UploadableField(mapping: 'photos', fileNameProperty: 'image.name', size: 'image.size')]
     private ?File $imageFile = null;
 
+     /**
+     * @ORM\Embedded(class="Vich\UploaderBundle\Entity\File")
+     * @var EmbeddedFile|null
+     */
     #[ORM\Embedded(class: 'Vich\UploaderBundle\Entity\File')]
     private ?EmbeddedFile $image = null;
 
@@ -44,6 +53,9 @@ class Photo
 
     #[ORM\OneToOne(mappedBy: 'photo', cascade: ['persist', 'remove'])]
     private ?Section $section = null;
+
+    #[ORM\OneToOne(mappedBy: 'coverPhoto', cascade: ['persist', 'remove'])]
+    private ?Projets $projet = null;
 
     #[ORM\ManyToOne(inversedBy: 'photos')]
     #[ORM\JoinColumn(nullable: false)]
@@ -126,15 +138,31 @@ class Photo
         // unset the owning side of the relation if necessary
         if ($section === null && $this->section !== null) {
             $this->section->setPhoto(null);
+            $this->projet = null; // Empêcher l'utilisation simultanée comme couverture de projet
         }
 
         // set the owning side of the relation if necessary
         if ($section !== null && $section->getPhoto() !== $this) {
             $section->setPhoto($this);
+            $this->projet = null; // Empêcher l'utilisation simultanée comme couverture de projet
         }
 
         $this->section = $section;
 
+        return $this;
+    }
+
+    public function getProjet(): ?Projets
+    {
+        return $this->projet;
+    }
+
+    public function setProjet(?Projets $projet): static
+    {
+        if ($projet !== null) {
+            $this->section = null; // Empêcher l'utilisation simultanée dans une section
+        }
+        $this->projet = $projet;
         return $this;
     }
 

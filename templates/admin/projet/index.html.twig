@@ -122,6 +122,7 @@
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
+                            <th scope="col" class="px-4 py-3"></th>
                             <th scope="col" class="px-4 py-3">Titre</th>
                             <th scope="col" class="px-4 py-3">Date de création</th>
                             <th scope="col" class="px-4 py-3">Dernière modification</th>
@@ -135,16 +136,19 @@
                     <tbody>
                     {% for projet in projets %}
                         <tr class="border-b dark:border-gray-700">
-                        
-                            <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{projet.title}}</th>
+                            <td scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img src="{{ vich_uploader_asset(projet.coverPhoto, 'imageFile') | imagine_filter('tab_thumbnail') }}" alt="Photo de couverture {{ projet.title }}"></td>
+                            <td scope="px-4 py-3" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{projet.title}}</td>
                             <td class="px-4 py-3">{{projet.createdAt|date('Y-m-d H:i:s')}}</td>
                             <td class="px-4 py-3">{{projet.updatedAt|date('Y-m-d H:i:s')}}</td>
-                            <td class="px-4 py-3 flex items-center justify-end">
-                                <button id="{{projet.id}}-dropdown-button" data-dropdown-toggle="{{projet.id}}-dropdown" class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" type="button">
+                            <td class="px-4 py-3 flex items-center justify-end" HEIGHT="100%">
+                                <div>
+                                    <button id="{{projet.id}}-dropdown-button" data-dropdown-toggle="{{projet.id}}-dropdown" class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" type="button">
                                     <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                     </svg>
                                 </button>
+                                </div>
+                                
                                 <div id="{{projet.id}}-dropdown" class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                                     <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="{{projet.id}}-dropdown-button">
                                         <li>
