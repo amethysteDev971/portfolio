@@ -8,13 +8,15 @@ FROM php:8.3-fpm AS php_base
 WORKDIR /app
 VOLUME /app/var/
 
-# Mise à jour et installation des dépendances système
+# Mise à jour et installation des dépendances système, y compris unzip et libzip-dev
 RUN apt-get update && apt-get install -y --no-install-recommends \
     acl \
     file \
     gettext \
     git \
     curl \
+    unzip \
+    libzip-dev \
     libmagickwand-dev \
     pkg-config \
     libfreetype6-dev \
@@ -28,13 +30,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Étape 2 : Installation des extensions PHP
 #########################################
 
-# --- Extension GD avec support de FreeType, JPEG et WebP ---
+# Extension GD avec support de FreeType, JPEG et WebP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
     docker-php-ext-install gd
 
-# --- Installation manuelle de l'extension Imagick ---
-# Nous téléchargeons la version 3.6.0, patchons le stub pour ajouter un "#endif" manquant,
-# puis compilons et installons l’extension.
+# Extension ZIP (nécessite libzip-dev et unzip)
+RUN docker-php-ext-install zip
+
+# Installation manuelle de l'extension Imagick (version 3.6.0)
 RUN pecl download imagick-3.6.0 && \
     tar xf imagick-3.6.0.tgz && \
     sed -i '$a#endif' imagick-3.6.0/Imagick.stub.php && \
@@ -45,7 +48,7 @@ RUN pecl download imagick-3.6.0 && \
     docker-php-ext-enable imagick && \
     cd .. && rm -rf imagick-3.6.0*
 
-# --- Extension PDO MySQL (pour se connecter à MySQL) ---
+# Extension PDO MySQL
 RUN docker-php-ext-install pdo_mysql
 
 #########################################
@@ -73,11 +76,10 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 # Étape 5 : Cibles pour Dev et Prod
 #########################################
 FROM php_base AS php_dev
-# (Vous pouvez ajouter ici des personnalisations pour l’environnement de développement, par exemple l’installation de Xdebug)
+# (Ajoutez ici d'éventuelles personnalisations pour l'environnement de développement, par exemple Xdebug)
 
 FROM php_base AS php_prod
-# (Ajoutez ici des optimisations spécifiques pour la production)
-
+# Optimisations spécifiques pour la production
 RUN mkdir -p /app/var/cache && chown -R www-data:www-data /app/var
 
 #########################################

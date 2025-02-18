@@ -81,10 +81,9 @@
                   </form> #}
                   
                     {% for section in projet.sections %}
-                        <h2 class="text-2xl font-bold">Photo LiipImagineBundle</h2>
+                        {# <h2 class="text-2xl font-bold">Photo LiipImagineBundle</h2> #}
                         {# Par exemple, pour afficher l'image d'une section avec le filtre thumbnail #}
-                        {# Par exemple, pour afficher l'image d'une section avec le filtre thumbnail #}
-                        <img src="{{ vich_uploader_asset(section.photo, 'imageFile') | imagine_filter('thumbnail') }}" alt="{{ section.photo.alt }}">
+                        {# <img src="{{ vich_uploader_asset(section.photo, 'imageFile') | imagine_filter('thumbnail') }}" alt="{{ section.photo.alt }}"> #}
                         <p>description : {{ section.description }}</p>
                         <div class=""><img src="{{ vich_uploader_asset(section.photo, 'imageFile') }}" alt="{{ section.photo.alt }}" class=""></div>
                     {% endfor %}

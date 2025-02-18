@@ -136,7 +136,14 @@
                     <tbody>
                     {% for projet in projets %}
                         <tr class="border-b dark:border-gray-700">
-                            <td scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img src="{{ vich_uploader_asset(projet.coverPhoto, 'imageFile') | imagine_filter('tab_thumbnail') }}" alt="Photo de couverture {{ projet.title }}"></td>
+                            <td>
+                            {# <td scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img src="{{ vich_uploader_asset(projet.coverPhoto, 'imageFile') | imagine_filter('tab_thumbnail') }}" alt="Photo de couverture {{ projet.title }}"></td> #}
+                            {% if projet.coverPhoto is not null %}
+                                <img src="{{ vich_uploader_asset(projet.coverPhoto, 'imageFile') | imagine_filter('tab_thumbnail') }}" alt="Photo de couverture {{ projet.title }}">
+                            {% else %}
+                                {# <img src="/path/to/placeholder.png" alt="Aucune photo de couverture"> #}
+                            {% endif %}
+                            </td>
                             <td scope="px-4 py-3" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{projet.title}}</td>
                             <td class="px-4 py-3">{{projet.createdAt|date('Y-m-d H:i:s')}}</td>
                             <td class="px-4 py-3">{{projet.updatedAt|date('Y-m-d H:i:s')}}</td>
