@@ -2,41 +2,67 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
 use App\Repository\ProjetsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
+// ROLE_USER
 #[ORM\Entity(repositoryClass: ProjetsRepository::class)]
+#[ApiResource(
+    security: "is_granted('ROLE_USER')",
+    normalizationContext: ['groups' => ['projet:read']],
+    denormalizationContext: ['groups' => ['projet:write']],
+    operations: [
+        new Get(normalizationContext: ['groups' => ['projet:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['projet:read']])
+    ],
+    order: ['id' => 'ASC'],
+    paginationEnabled: false
+)]
 class Projets
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['projet:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?string $title = null;
 
     /**
      * @var Collection<int, Section>
      */
     #[ORM\OneToMany(mappedBy: 'projets', targetEntity: Section::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['projet:read', 'projet:write'])]
     private Collection $sections;
 
     #[ORM\ManyToOne(inversedBy: 'projet')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?User $user = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options:["default" => "CURRENT_TIMESTAMP"])]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options:["default" => "CURRENT_TIMESTAMP"])]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['projet:read', 'projet:write'])]
     private ?Photo $coverPhoto = null;
 
     public function __construct()

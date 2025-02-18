@@ -14,3 +14,16 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     tty: true
+  phpmyadmin:
+    container_name: "phpmyadmin"
+    image: phpmyadmin:latest
+    depends_on:
+      - database
+    # restart: always
+    environment:
+      PMA_PORT: "3306"
+      PMA_HOST: "database"
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 81:80

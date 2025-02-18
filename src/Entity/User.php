@@ -9,24 +9,43 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ApiResource(
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']],
+    operations: [
+        new Get(normalizationContext: ['groups' => ['user:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['user:read']])
+    ],
+    order: ['id' => 'ASC'],
+    paginationEnabled: false
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['user:read'])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user:read', 'projet:write'])]
     private array $roles = [];
 
     /**
@@ -36,18 +55,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private bool $isVerified = false;
 
     /**
      * @var Collection<int, Photo>
      */
     #[ORM\OneToMany(targetEntity: Photo::class, mappedBy: 'user', orphanRemoval: true)]
+    // #[Groups(['projet:read', 'projet:write'])]
     private Collection $photos;
 
     /**
      * @var Collection<int, Projets>
      */
     #[ORM\OneToMany(targetEntity: Projets::class, mappedBy: 'user', orphanRemoval: true)]
+    #[Groups(['user:read', 'user:write'])]
     private Collection $projet;
 
     public function __construct()

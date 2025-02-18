@@ -9,16 +9,33 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Entity\File as EmbeddedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 #[Vich\Uploadable]
+#[ApiResource(
+    normalizationContext: ['groups' => ['photo:read']],
+    denormalizationContext: ['groups' => ['photo:write']],
+    operations: [
+        new Get(normalizationContext: ['groups' => ['photo:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['photo:read']])
+    ],
+    order: ['id' => 'ASC'],
+    paginationEnabled: false
+)]
 class Photo
 {
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['photo:read'])]
     private ?int $id = null;
 
     // #[Vich\UploadableField(mapping: 'photos', fileNameProperty: 'path', size: 'image.size')]
@@ -27,6 +44,7 @@ class Photo
      * @var File|null
      */
     #[Vich\UploadableField(mapping: 'photos', fileNameProperty: 'image.name', size: 'image.size')]
+    // #[Groups(['photo:read', 'photo:write'])]
     private ?File $imageFile = null;
 
      /**
@@ -34,12 +52,15 @@ class Photo
      * @var EmbeddedFile|null
      */
     #[ORM\Embedded(class: 'Vich\UploaderBundle\Entity\File')]
+    // #[Groups(['photo:read', 'photo:write'])]
     private ?EmbeddedFile $image = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?string $path = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?string $alt = null;
 
     #[ORM\Column(nullable: true)]
@@ -49,19 +70,24 @@ class Photo
     private ?string $mimeType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?string $description = null;
 
     #[ORM\OneToOne(mappedBy: 'photo', cascade: ['persist', 'remove'])]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?Section $section = null;
 
     #[ORM\OneToOne(mappedBy: 'coverPhoto', cascade: ['persist', 'remove'])]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?Projets $projet = null;
 
     #[ORM\ManyToOne(inversedBy: 'photos')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?User $user = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['photo:read', 'photo:write'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
