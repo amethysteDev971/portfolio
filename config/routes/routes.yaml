@@ -1,1 +1,4 @@
 # This file can be deleted.
+auth:
+  path: /api/login_check
+  methods: ['POST']

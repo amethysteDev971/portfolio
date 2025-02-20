@@ -1,5 +1,15 @@
 # Portfolio Amethyste Design
 
+* JWT/API
+//Permet de générer les clés dans le bon contexte, sans les inclure dans le build de l’image. 
+docker compose exec php sh -c '
+    apt-get update && apt-get install -y openssl
+    php bin/console lexik:jwt:generate-keypair
+    setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
+    setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
+'
+
+
 * Pour deployer un jeux de datas par défault :
 php bin/console doctrine:fixtures:load
 
@@ -10,10 +20,20 @@ php bin/console doctrine:schema:validate
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 
-* solution tailwind encore en test
+* solution tailwind avec Encore/WebPack encore en test
 npm install 
-npm run dev
+
+// compile assets and automatically re-compile when files change
 npm run watch
+
+//compile assets once
+npm run dev
+
+//recompile
+npm run watch
+
+//on deploy, create a production build
+npm run build
 
 debug Docker : https://forums.docker.com/t/malware-blocked-com-docker-vmnetd-was-not-opened-because-it-contains-malware/145930/39
 
