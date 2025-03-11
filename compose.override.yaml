@@ -2,18 +2,26 @@ services:
   php:
     build:
       context: .
-      dockerfile: docker/config/php/Dockerfile
-      target: php_dev
+      target: frankenphp_dev
     volumes:
       - ./:/app
-      - ./docker/config/php/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./docker/config/php/conf.d/20-app.dev.ini:/usr/local/etc/php/conf.d/20-app.dev.ini:ro
+      - ./docker/config/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./docker/config/frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
+      # If you develop on Mac or Windows you can remove the vendor/ directory
+      #  from the bind-mount for better performance by enabling the next line:
+      #- /app/vendor
+      - ./docker/config/frankenphp/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint:ro
     environment:
       MERCURE_EXTRA_DIRECTIVES: demo
+      # See https://xdebug.org/docs/all_settings#mode
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
     extra_hosts:
+      # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
     tty: true
+  
+  
+  
   phpmyadmin:
     container_name: "phpmyadmin"
     image: phpmyadmin:latest
