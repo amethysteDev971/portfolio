@@ -24,7 +24,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/send-email', name: 'send_email')]
-    public function sendEmail(MailerInterface $mailer): Response
+    public function sendEmail(MailerInterface $mailer, Transport $transport): Response
     {
         $email = (new Email())
             ->from('no-reply@amethyste-design.fr')
@@ -37,7 +37,7 @@ class HomeController extends AbstractController
 
         return new Response('Email envoyé avec succès !');
     }
-    #[Route('/send-email2', name: 'send_email')]
+    #[Route('/send-email2', name: 'send_email2')]
     public function sendEmail2(): Response
     {
         // Remplacez par vos identifiants Mailjet
