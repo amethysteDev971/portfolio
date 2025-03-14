@@ -24,7 +24,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/send-email', name: 'send_email')]
-    public function sendEmail(MailerInterface $mailer, Transport $transport): Response
+    public function sendEmail(MailerInterface $mailer): Response
     {
         $email = (new Email())
             ->from('no-reply@amethyste-design.fr')
