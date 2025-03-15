@@ -9,6 +9,8 @@
 /public/bundles/
 /var/
 /vendor/
+public/uploads/photos/.DS_Store
+/Doc.md
 ###< symfony/framework-bundle ###
 /docker/volumes/*
 

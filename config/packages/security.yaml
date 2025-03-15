@@ -27,8 +27,11 @@ security:
             pattern: ^/api/
             stateless: true
             provider: app_user_provider
+            entry_point: jwt
             # Si utilisation de JWT, activation OK :
             jwt: ~
+            refresh_jwt:
+                check_path: /api/token/refresh
         # Firewall pour la connexion : permet d’obtenir un token via un login JSON
         # login:
         #     pattern:  ^/api/login_check
@@ -60,7 +63,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # Permettre l’accès anonyme à la connexion
-        - { path: ^/api/login_check, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/(login_check|token/refresh), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         # pour accéder à l'API sans authentifications /api/docs
         - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI docs
         - { path: ^/api/openapi.json, roles: PUBLIC_ACCESS } # Allows accessing the OpenAPI spec
