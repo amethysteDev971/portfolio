@@ -23,6 +23,11 @@ yarn-error.log
 /public/media/cache/
 ###< liip/imagine-bundle ###
 
+###> vich_uploader ###
+/public/uploads/photos/*
+
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+

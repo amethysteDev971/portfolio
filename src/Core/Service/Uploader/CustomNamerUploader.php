@@ -2,12 +2,22 @@
 
 namespace App\Core\Service\Uploader;
 
+use Psr\Log\LoggerInterface;
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Symfony\Component\HttpFoundation\File\File;
 
 class CustomNamerUploader implements NamerInterface
 {
+    private ?LoggerInterface $logger;
+
+    // Le logger devient optionnel avec une valeur par défaut null.
+    public function __construct(?LoggerInterface $logger = null)
+    {
+        $this->logger = $logger;
+    }
+
+
     /**
      * Crée un nom pour le fichier téléchargé.
      *
@@ -31,6 +41,10 @@ class CustomNamerUploader implements NamerInterface
 
         // Génére un nom unique pour le fichier
         $extension = $file->guessExtension() ?? 'bin'; // Par défaut "bin" si aucune extension
+        // Si un logger a été injecté, enregistre un message de debug.
+        if (null !== $this->logger) {
+            $this->logger->debug('Extension devinée: ' . $extension);
+        }
         return uniqid() . '.' . $extension; // Ne retourne que le nom du fichier
     }
 }
