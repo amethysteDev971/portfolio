@@ -25,7 +25,7 @@ class PhotoType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '1024k',
+                        'maxSize' => '3M',
                         'mimeTypes' => [
                             'image/jpeg',
                             'image/x-png',

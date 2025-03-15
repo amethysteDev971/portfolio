@@ -45,7 +45,7 @@ class SectionByProjectType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '2M',
+                        'maxSize' => '3M',
                         'mimeTypes' => [
                             'image/jpeg',
                             'image/x-png',

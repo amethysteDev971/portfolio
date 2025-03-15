@@ -54,7 +54,7 @@ class ProjetType extends AbstractType
                 'required' => false,// Facultatif pour ne pas bloquer la création
                 'constraints' => [
                     new File([
-                        'maxSize' => '2M',
+                        'maxSize' => '3M',
                         'mimeTypes' => [
                             'image/jpeg',
                             'image/x-png',
