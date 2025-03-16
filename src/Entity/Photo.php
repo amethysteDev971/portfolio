@@ -293,5 +293,21 @@ class Photo
         return $this->image ? $this->image->getDimensions() : null;
     }
 
+    /**
+     * Retourne le nom de l'image stockée dans l'objet embarqué.
+     */
+    #[Groups(['photo:read', 'photo:write'])]
+    public function getImageName(): ?string
+    {
+        return $this->image ? $this->image->getName() : null;
+    }
+
+    // Vous pouvez aussi ajouter un getter pour l'original si besoin
+    #[Groups(['photo:read', 'photo:write'])]
+    public function getImageOriginalName(): ?string
+    {
+        return $this->image ? $this->image->getOriginalName() : null;
+    }
+
 
 }

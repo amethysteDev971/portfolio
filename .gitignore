@@ -27,6 +27,7 @@ yarn-error.log
 
 ###> vich_uploader ###
 /public/uploads/photos/*
+/public/uploads/photos/.DS_Store
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
