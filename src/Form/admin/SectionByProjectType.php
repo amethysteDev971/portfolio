@@ -48,6 +48,7 @@ class SectionByProjectType extends AbstractType
                         'maxSize' => '3M',
                         'mimeTypes' => [
                             'image/jpeg',
+                            'image/jpg',
                             'image/x-png',
                             'image/png',
                             'image/gif'

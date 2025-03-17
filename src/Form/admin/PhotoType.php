@@ -28,9 +28,11 @@ class PhotoType extends AbstractType
                         'maxSize' => '3M',
                         'mimeTypes' => [
                             'image/jpeg',
+                            'image/jpg',
                             'image/x-png',
                             'image/png',
                             'image/gif'
+                             
                         ],
                         'mimeTypesMessage' => 'Veuillez télécharger une image valide (jpeg, png, gif).',
                     ])
