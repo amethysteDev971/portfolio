@@ -1,0 +1,13 @@
+# config/packages/dev/monolog.yaml
+monolog:
+  handlers:
+    # remplace (ou complète) votre handler php://stderr pour écrire dans dev.log
+    file_log:
+      type: stream
+      path: '%kernel.logs_dir%/%kernel.environment%.log'  # => var/log/dev.log
+      level: debug
+      channels: ['!event']   # on loggue tout sauf les événements symfony internes
+    console:
+      type: console
+      process_psr_3_messages: false
+      channels: ['!event','!doctrine','!console']

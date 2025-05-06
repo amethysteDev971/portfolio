@@ -1,0 +1,39 @@
+<!-- Modal header -->
+<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+        Supprimer une section
+    </h3>
+    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="control-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+        </svg>
+        <span class="sr-only">Close modal</span>
+    </button>
+</div>
+<!-- Modal body -->
+<div class="sections-list-delete">
+  <div class="flex justify-center p-4 md:p-5 space-y-4">
+    <ul id="section-list">
+      {% for section in sections %}
+        <li data-id="{{ section.id }}" class="border border-solid flex gap-4 items-center px-4 py-2">
+          <button
+            type="button"
+            class="js-delete-section-btn text-white bg-red-600 hover:bg-red-700 rounded p-2"
+            data-section-id="{{ section.id }}"
+          >
+              <svg class="w-6 h-6 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+              </svg>
+          </button>
+          <div><img src="{{ vich_uploader_asset(section.photo, 'imageFile') }}" width="100"></div>
+          <div><p>Description : {{ section.description }}</p></div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+</div>
+<!-- Modal footer -->
+<div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+    <button data-modal-hide="control-modal" data-action="close" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Fermer</button>
+</div>

@@ -53,8 +53,14 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		fi
 	fi
 
-	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
-	setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
+	# Si setfacl n’est pas supporté (ex. Docker Desktop macOS), on skippe
+    # if command -v setfacl >/dev/null 2>&1; then
+    # 	echo "→ Configuration ACL sur var/ : OK"
+    #   	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
+    #  	setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
+    # else
+    #  	echo "⚠️  ACL non supportées, on skippe setfacl"
+    # fi
 
 	echo 'PHP app ready!'
 fi

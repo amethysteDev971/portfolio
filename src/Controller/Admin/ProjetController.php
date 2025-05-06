@@ -22,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Persistence\Proxy;
+use PhpParser\Builder\Property;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
@@ -51,139 +52,134 @@ class ProjetController extends BaseController
     }
 
     #[Route('/admin/projet/create', name: 'app_admin_projet_create')]
-    public function create(EntityManagerInterface $em, Request $request, Security $security): Response
-    {   
-        $projet = new Projets();
-        $projet->setUser($security->getUser());
+    public function create(
+        EntityManagerInterface $em,
+        Request $request,
+        Security $security
+    ): Response {
+        $user    = $security->getUser();
+        $projet  = new Projets();
+        $projet->setUser($user);
+
+        // On prépare la première section
         $section = new Section();
-        //Savoir si des sections existe
-        $sections = $em->getRepository(Section::class)->findAll();
-        if (empty($sections)){
-            $section->setRangePosition(1);
-        }else{
-            $section->setRangePosition(count($sections)+1);
+        $count   = $em->getRepository(Section::class)->count([]);
+        $section->setRangePosition($count + 1);
+        $projet->addSection($section);
+
+        // Pas encore de photo attachée => on prépare un Photo vierge
+        $photo = $section->getPhoto();
+        if (null === $photo) {
+            $photo = new Photo();
+            $photo->setUser($user);
+            $section->setPhoto($photo);
         }
 
+        // Création du formulaire exactement comme pour update
         $form = $this->createForm(ProjetType::class, $projet, [
-            'action' => $this->generateUrl('app_admin_projet_create'),
-            'method' => 'POST',
-            'description' => '',
-            'alt' => '',
-            'description_photo' => '',
-            'image_path' => null, // Pas d'image à afficher
+            'action'            => $this->generateUrl('app_admin_projet_create'),
+            'method'            => 'POST',
+            'alt'               => $photo->getAlt(),
+            'description_photo' => $photo->getDescription(),
+            'image_path'        => $photo->getUrl(),  // votre getter url()
         ]);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            // Récupérer les données non mappées pour la photo
-            $alt = $form->get('alt')->getData();
-            $description = $form->get('description_photo')->getData();
-            $imageFile = $form->get('imageFile')->getData();// Traitement de l'image uploadée
+            // Mise à jour de la description de la section
+            $section->setDescription($form->get('description')->getData());
 
-            if ($imageFile) {
-    
-                // Créer une nouvelle entité Photo
-                $photo = new Photo();
-                $photo->setAlt($alt);
-                $photo->setDescription($description);
-                $photo->setUser($security->getUser());
-                $photo->setImageFile($form->get('imageFile')->getData());
-                $photo->setPath($photo->getName());
-                
-                $section->setPhoto($photo);
-                $projet->addSection($section);
-                
-                //Persister la photo
-                $em->persist($photo);
-                $em->persist($section);
+            /** @var UploadedFile|null $uploadedFile */
+            $uploadedFile = $form->get('imageFile')->getData();
+            if ($uploadedFile) {
+                // VichUploader gère l’upload et la suppression de l’ancien fichier
+                $photo->setImageFile($uploadedFile);
+                $photo->setAlt($form->get('alt')->getData());
+                $photo->setDescription($form->get('description_photo')->getData());
             }
 
-            $embeddedFile = $photo->getImage();
-            if ($embeddedFile) {
-                $photo->setPath('uploads/photos'.'/'.$photo->getUser()->getId().'/'.$embeddedFile->getName());
-            }
-
-            $projet = $form->getData();
+            // Grâce au cascade persist/remove sur Section::$photo, un seul persist + flush suffit
             $em->persist($projet);
             $em->flush();
+
             return $this->redirectToRoute('app_admin_projet_list');
         }
-        
+
         return $this->render('admin/projet/new.html.twig', [
-            'controller_name' => 'ProjetController',
-            'form' => $form,
+            'controller_name' => 'ProjetController create',
+            'form'            => $form->createView(),
+            'projet'          => $projet,
         ]);
     }
 
+
+
     #[Route('admin/projet/update/{id}', name: 'app_admin_projet_update')]
-    public function updateProjet(EntityManagerInterface $em, Request $request, $id): Response
-    {
+    public function updateProjet(
+        EntityManagerInterface $em,
+        Request $request,
+        Security $security,
+        $id
+    ): Response {
+        $user   = $security->getUser();
+        $projet = $em->getRepository(Projets::class)->find($id);
 
-    $projet = $em->getRepository(Projets::class)->find($id);
-
-    if (!$projet) {
-        throw $this->createNotFoundException('Projet non trouvé');
-    }
-
-    $sections = $projet->getSections();
-    $sectionFirst = $sections[0] ?? null;
-    if (!$sectionFirst) {
-        throw new \Exception('Aucune section trouvée.');
-    }
-
-    $photo = $sectionFirst->getPhoto();
-    if (!$photo) {
-        throw new \Exception('Aucune photo trouvée pour la section.');
-    }
-
-    $form = $this->createForm(ProjetType::class, $projet, [
-        'description' => $sectionFirst->getDescription() ?? '',
-        'alt' => $photo->getAlt() ?? '',
-        'description_photo' => $photo->getDescription() ?? '',
-        'image_path' => $photo->getPath() ?? null,
-    ]);
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $uploadedFile = $form->get('imageFile')->getData();
-        //mettre à jour la section
-        $sectionFirst->setDescription($form->get('description')->getData());
-
-        if ($uploadedFile) {
-            $photo->setImageFile($uploadedFile);
-            $photo->setAlt($form->get('alt')->getData());
-            $photo->setDescription($form->get('description_photo')->getData());
+        if (!$projet) {
+            throw $this->createNotFoundException('Projet non trouvé');
         }
 
-        $em->persist($photo); // Persiste uniquement après toutes les modifications
-    
-        
-        $projet = $form->getData();
-        $em->persist($projet);
-       
-        $em->flush();
-
-        //*Seule moyen de récupérer imageName vichUploader 
-        //* met à jour après le flush
-        //TODO Revenir sur l'automatisation des datas voir configuration de VichUploader
-        $embeddedFile = $photo->getImage();
-        if ($embeddedFile) {
-            // dump($embeddedFile);
-            $photo->setPath('uploads/photos'.'/'.$photo->getUser()->getId().'/'.$embeddedFile->getName());
+        // On récupère (ou crée) la première section
+        $sections     = $projet->getSections();
+        $section      = $sections->first();
+        if (!$section) {
+            throw new \Exception('Aucune section trouvée.');
         }
-        $em->persist($photo);
-        $em->flush();
-        // exit();
-        return $this->redirectToRoute('app_admin_projet_list');
-    }
-    
+
+        // On récupère (ou prépare) la Photo liée à cette section
+        $photo = $section->getPhoto();
+        if (!$photo) {
+            $photo = new Photo();
+            $photo->setUser($user);
+            $section->setPhoto($photo);
+        }
+
+        // On monte le formulaire exactement comme en create
+        $form = $this->createForm(ProjetType::class, $projet, [
+            'action'            => $this->generateUrl('app_admin_projet_update', ['id' => $id]),
+            'method'            => 'POST',
+            'alt'               => $photo->getAlt(),
+            'description_photo' => $photo->getDescription(),
+            'image_path'        => $photo->getUrl(), // via votre getter url()
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // On met à jour la description de la section
+            $section->setDescription($form->get('description')->getData());
+
+            /** @var UploadedFile|null $uploadedFile */
+            $uploadedFile = $form->get('imageFile')->getData();
+            if ($uploadedFile) {
+                // Vich va gérer le remplacement et la suppression ancienne image
+                $photo->setImageFile($uploadedFile);
+                $photo->setAlt($form->get('alt')->getData());
+                $photo->setDescription($form->get('description_photo')->getData());
+            }
+
+            // Grâce au cascade persist/remove sur Section::$photo, un seul flush suffit
+            $em->flush();
+
+            return $this->redirectToRoute('app_admin_projet_list');
+        }
 
         return $this->render('admin/projet/new.html.twig', [
             'controller_name' => 'ProjetController update',
-            'form' => $form->createView(),
+            'form'            => $form->createView(),
+            'projet'          => $projet
         ]);
     }
+
+
 
     #[Route('admin/projet/delete/{id}', name: 'app_admin_projet_delete')]
     public function deleteProjet(EntityManagerInterface $em,Request $request, $id): Response
@@ -209,9 +205,40 @@ class ProjetController extends BaseController
         return $this->redirectToRoute('app_admin_projet_list');
     }
 
+    #[Route(
+        '/admin/projet/delete/section/modal/{projectId}/{sectionId}',
+        name: 'app_admin_projet_delete_section_modal',
+        methods: ['DELETE']
+    )]
+    public function deleteSectionModal(
+        EntityManagerInterface $em,
+        int $projectId,
+        int $sectionId
+    ): Response {
+        $projet = $em->getRepository(Projets::class)->find($projectId);
+        if (!$projet) {
+            throw new NotFoundHttpException('Projet non trouvé');
+        }
+    
+        $section = $em->getRepository(Section::class)->find($sectionId);
+        if (
+            !$section
+            || null === $section->getProjets()
+            || $section->getProjets()->getId() !== $projet->getId()
+        ) {
+            throw new NotFoundHttpException('Section non trouvée pour ce projet');
+        }
+    
+        $em->remove($section);
+        $em->flush();
+    
+        return new Response('Section supprimée avec succès', Response::HTTP_OK);
+    }
+
     #[Route('admin/projet/show/{id}', name: 'app_admin_projet_show')]
-    public function showProjet(EntityManagerInterface $em, Request $request, $id, SectionsServices $sectionsServices): Response
+    public function showProjet(EntityManagerInterface $em, Request $request, $id, SectionsServices $sectionsServices, LoggerInterface $logger): Response
     {
+        $logger->info('🔥 TEST LOG');
         // Récupérer le projet par son ID
         $projet = $em->getRepository(Projets::class)->find($id);
 
@@ -274,24 +301,35 @@ class ProjetController extends BaseController
                                     SectionsServices $sectionsServices, Request $request,
                                     Security $security): Response
     {
+        
         try {
             // Récupérer le projet par son ID
             $projet = $em->getRepository(Projets::class)->find($id);
             $sections = $projet->getSections();
             $sectionsArray = $sections->toArray();
 
+
             // Vérifier si le projet existe
             if (!$projet) {
                 throw $this->createNotFoundException('Projet non trouvé');
             }
 
-            if ($action ==='add_section') {
+            if ($action ==='reorganize' || $action ==='delete_section') {
+                // Récupérer les sections du projet
+                $sections = $projet->getSections();
+                // dump($sections);
+                // exit();
+                // Vérifier si la collection de sections est vide
+                if ($sections->isEmpty()) {
+                    throw new \Exception('Aucune section trouvée pour ce projet.');
+                }
                // Convertir la collection en tableau
                 
                 
 
                 // Trier le tableau
                 usort($sectionsArray, array($sectionsServices, 'asortSectionByRangePosition')); 
+            
             }
             
 
@@ -324,8 +362,10 @@ class ProjetController extends BaseController
                         $photo->setDescription($description);
                         $photo->setImageFile($form->get('imageFile')->getData());
                         // $photo->setPath($newFilename);
-                        $photo->setMimeType($imageFile->getClientMimeType());
-                        $photo->setSize($imageFile->getSize());
+
+                        //TODO EmbededFile do not exist anymore
+                        // $photo->setMimeType($imageFile->getClientMimeType());
+                        // $photo->setSize($imageFile->getSize());
                         $photo->setUser($security->getUser());
                         $newFilename = 'public/uploads/photos'.'/'.$photo->getUser()->getId().'/'.uniqid() . '.' . $imageFile->guessExtension();
                         $photo->setPath($newFilename);
@@ -373,6 +413,20 @@ class ProjetController extends BaseController
                         'action' => $action,
                         'form' => $form,
                     ]);
+                case 'delete_section':
+                    // $sectionId = $request->request->get('section_id');
+                    // $section = $em->getRepository(Section::class)->find($sectionId);
+                    // if (!$section) {
+                    //     throw new NotFoundHttpException('Section non trouvée');
+                    // }
+                    // $em->remove($section);
+                    // $em->flush();
+                    // return new Response('Section supprimée avec succès', Response::HTTP_OK);
+                    return $this->render('admin/projet/sections_list_delete.html.twig', [
+                        'projet' => $projet,
+                        'sections' => $sectionsArray,
+                        'action' => $action,
+                    ]);
                 default:
                     throw new \Exception('Action non reconnue action reçue = '.$action);
             }
@@ -380,95 +434,118 @@ class ProjetController extends BaseController
             return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
+    
 
     #[Route('/upload-cropped-image', name: 'upload_cropped_image', methods: ['POST'])]
-    public function uploadCroppedImage(Request $request, EntityManagerInterface $em, Security $security,LoggerInterface $logger): JsonResponse
-    {
-        $projetId = $request->get('projet_id');
+    public function uploadCroppedImage(
+        Request $request,
+        EntityManagerInterface $em,
+        Security $security,
+        LoggerInterface $logger
+    ): JsonResponse {
+        $projetId    = $request->request->get('projet_id');
         $uploadedFile = $request->files->get('croppedImage');
+
+        $logger->info('🔥 Début de upload_cropped_image', [
+            'projectId' => $projetId,
+            'user'      => $this->getUser()->getId(),
+        ]);
 
         if (!$uploadedFile instanceof UploadedFile) {
             return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         }
 
         $projet = $em->getRepository(Projets::class)->find($projetId);
-
         if (!$projet) {
             return new JsonResponse(['error' => 'Project not found'], Response::HTTP_NOT_FOUND);
         }
 
         $user = $security->getUser();
-        if ($user instanceof User) {
-            // Créer une nouvelle entité Photo pour la couverture du projet
-            $photo = new Photo();
-            $photo->setUser($user);
-            $photo->setImageFile($uploadedFile);
-            $photo->setAlt('Cover image for project ' . $projet->getTitle());
-            $photo->setDescription('Cover image uploaded for the project');
-
-            // Associer cette photo comme couverture du projet
-            $projet->setCoverPhoto($photo);
-
-            // Persister la photo et le projet
-            $em->persist($photo);
-            $em->persist($projet);
-            $em->flush();
-
-            // Obtenir l'URL publique du fichier téléchargé
-            $fileUrl = $this->storage->resolveUri($photo, 'imageFile');
-
-            return new JsonResponse(['url' => $fileUrl]);
-        } else {
-            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        if (! $user) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
+
+        // Créer la Photo et l'associer
+        $photo = new Photo();
+        $photo->setUser($user);
+        $photo->setImageFile($uploadedFile);
+        $photo->setAlt('Cover image for project '.$projet->getTitle());
+        $photo->setDescription('Cover image uploaded for project');
+
+        $projet->setCoverPhoto($photo);
+
+        $em->persist($photo);
+        $em->persist($projet);
+        $em->flush();
+
+        // Récupère l'URL publique générée par VichUploader
+        $fileUrl = $this->storage->resolveUri($photo, 'imageFile');
+
+        return new JsonResponse(['url' => $fileUrl]);
     }
 
     #[Route('/upload-cropped-image-update', name: 'upload_cropped_image_update', methods: ['POST'])]
-    public function updateUploadCroppedImage(Request $request, EntityManagerInterface $em, Security $security,LoggerInterface $logger,PropertyMappingFactory $propertyMappingFactory): JsonResponse
-    {
-        $projetId = $request->get('projet_id');
+    public function updateUploadCroppedImage(
+        Request $request,
+        EntityManagerInterface $em,
+        Security $security,
+        LoggerInterface $logger
+    ): JsonResponse {
+        $projetId     = $request->request->get('projet_id');
         $uploadedFile = $request->files->get('croppedImage');
+
+        $logger->info('🔥 Début de upload_cropped_image_update', [
+            'projectId' => $projetId,
+            'user'      => $this->getUser()->getId(),
+        ]);
 
         if (!$uploadedFile instanceof UploadedFile) {
             return new JsonResponse(['error' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         }
 
         $projet = $em->getRepository(Projets::class)->find($projetId);
-
         if (!$projet) {
             return new JsonResponse(['error' => 'Project not found'], Response::HTTP_NOT_FOUND);
         }
 
         $user = $security->getUser();
-        if ($user instanceof User) {
-            // Créer une nouvelle entité Photo pour la couverture du projet
-            $photo = $projet->getCoverPhoto();
-            if (!$photo) {
-                $photo = new Photo();
-                $photo->setUser($user);
-                $projet->setCoverPhoto($photo);
-                $em->persist($photo);
-            }else{
-                // Retrieve the PropertyMapping for the 'imageFile' field
-                $mapping = $this->propertyMappingFactory->fromField($photo, 'imageFile');
-                // Supprimer l'ancien fichier
-                $this->storage->remove($photo, $mapping);
-            }
-            $photo->setImageFile($uploadedFile);
-            $photo->setAlt('Cover image for project ' . $projet->getTitle());
-            $photo->setDescription('Cover image uploaded for the project');             
-
-            // Persister le projet
-            $em->persist($projet);
-            $em->flush();
-
-            // Obtenir l'URL publique du fichier téléchargé
-            $fileUrl = $this->storage->resolveUri($photo, 'imageFile');
-
-            return new JsonResponse(['url' => $fileUrl]);
-        } else {
-            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
+
+        // Récupère ou crée la Photo existante
+        $photo = $projet->getCoverPhoto();
+        if (!$photo) {
+            $photo = new Photo();
+            $photo->setUser($user);
+            $projet->setCoverPhoto($photo);
+            $em->persist($photo);
+        } else {
+            // Supprime l'ancien fichier via Vich
+            $mapping = $this->propertyMappingFactory->fromField($photo, 'imageFile');
+        
+            // Extrait juste le nom de fichier pour le logger
+            $oldPath     = $photo->getPath();                            // ex. "uploads/photos/14/ancien.png"
+            $oldFilename = basename($oldPath);                           // ex. "ancien.png"
+        
+            $this->storage->remove($photo, $mapping);
+            $logger->info('🔥 Ancien cover supprimé', [
+                'oldFile' => $oldFilename,
+            ]);
+        }
+
+        // On persiste explicitement la photo au cas où
+        $photo->setImageFile($uploadedFile);
+        $photo->setAlt('Cover image for project ' . $projet->getTitle());
+        $photo->setDescription('Cover image uploaded for project');
+        $em->persist($photo);
+
+        // On persiste aussi le projet pour la relation OneToOne
+        $em->persist($projet);
+        $em->flush();
+
+        $fileUrl = $this->storage->resolveUri($photo, 'imageFile');
+        return new JsonResponse(['url' => $fileUrl]);
     }
 
 }

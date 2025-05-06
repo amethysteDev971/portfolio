@@ -7,9 +7,9 @@ when@dev:
         handlers:
             main:
                 type: stream
-                # path: "%kernel.logs_dir%/%kernel.environment%.log"
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
                 # path: "/app/var/log/dev.log"
-                path: php://stderr
+                # path: php://stderr
                 level: debug
                 channels: ["!event"]
             # uncomment to get logging in your browser

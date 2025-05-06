@@ -52,6 +52,11 @@ COPY --link docker/config/frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 docker/config/frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link docker/config/frankenphp/Caddyfile /etc/caddy/Caddyfile
 
+# Assurer permissions sur var/cache et var/log pour www-data
+RUN mkdir -p var/cache var/log \
+&& chown -R www-data:www-data var/cache var/log \
+&& chmod -R 775 var/cache var/log
+
 ENTRYPOINT ["docker-entrypoint"]
 
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1

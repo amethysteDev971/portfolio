@@ -49,9 +49,10 @@ class ProjetType extends AbstractType
                 'data' => $options['image_path'] ?? null, // Option dynamique
             ])
             ->add('imageFile', FileType::class, [
-                'label' => 'Image',
+                'label' => false,
                 'mapped' => false,
                 'required' => false,// Facultatif pour ne pas bloquer la création
+                'attr'     => ['accept' => 'image/*'],
                 'constraints' => [
                     new File([
                         'maxSize' => '3M',
@@ -67,7 +68,7 @@ class ProjetType extends AbstractType
                 ],
             ])
             
-            ->add('save', SubmitType::class)
+            ->add('Enregistrer', SubmitType::class)
         ;
     }
 

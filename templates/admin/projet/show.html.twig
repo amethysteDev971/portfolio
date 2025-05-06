@@ -68,6 +68,9 @@
                                 <li>
                                     <a href="javascript:void(0)" data-action="add_section" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Ajouter une section</a>
                                 </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-action="delete_section" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Supprimer une section</a>
+                                </li>
                             </ul>
                       </div>
                     </div>
@@ -80,62 +83,88 @@
                     <button type="button" id="cropButton">Recadrer et Enregistrer</button>
                   </form> #}
                   
-                    {% for section in projet.sections %}
-                        {# <h2 class="text-2xl font-bold">Photo LiipImagineBundle</h2> #}
-                        {# Par exemple, pour afficher l'image d'une section avec le filtre thumbnail #}
-                        {# <img src="{{ vich_uploader_asset(section.photo, 'imageFile') | imagine_filter('thumbnail') }}" alt="{{ section.photo.alt }}"> #}
-                        {% if section.description is not empty %}
-                            <p>Description : {{ section.description }}</p>
-                        {% endif %}
-                        <div class="image_section"><img src="{{ vich_uploader_asset(section.photo, 'imageFile') }}" alt="{{ section.photo.alt }}" class=""></div>
-                    {% endfor %}
+                  {% for section in projet.sections %}
+                    {% if section.photo %}
+                    {# on récupère d’abord l’URL, ou null si pas d’image #}
+                      {% set sectionImg = vich_uploader_asset(section.photo, 'imageFile') %}
+                      {% if sectionImg %}
+                        <div class="image_section">
+                          <img
+                            src="{{ sectionImg }}"
+                            alt="{{ section.photo.alt|default('Section sans alt') }}"
+                            class="…votre-classes…"
+                          >
+                        </div>
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
                 </div>
             </div>
         </div>
 
-        {# test upload cover image #}
-          <div class="flex flex-col items-start justify-center w-ful m-4 img-container">
+        
+        {% set coverPath = projet.coverPhoto 
+            ? vich_uploader_asset(projet.coverPhoto, 'imageFile') 
+            : null 
+        %}
+
+        <div class="flex flex-col items-start justify-center w-full m-4 img-container">
           <h2 class="text-1xl font-bold">Photo de couverture</h2>
-          {# {% set isUploaded = 0 %} #}
-            {% if projet.coverPhoto %}
-            {# <p>{{isUploaded}}</p> #}
-                      <div id="cover_img_container" class="flex flex-col items-start justify-start w-full">
-                      
-                        <div class="image-container">
-                          
-                          <img id="cover_img" src="{{ vich_uploader_asset(projet.coverPhoto, 'imageFile') | imagine_filter('thumbnail') }}" alt="Photo de couverture">
-                          <div class="overlay">
-                              <span class="overlay-text">Modifier</span>
-                          </div>
-                        </div>
-                      </div>
-            {% endif %}    
-                  {# {% else %} #}
-                      <form id="uploadForm" enctype="multipart/form-data">
-                        <input type="hidden" id="projetId" name="projet_id" value="{{ projet.id }}">
-                        <label for="imageInput" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                            <div id="flowbite_area" class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                </svg>
-                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                            </div>
-                          
-                        </label>
-                        
-                        <input id="imageInput" type="file" class="hidden" accept="image/*"/>
-                        <img id="imagePreview" style="max-width: 100%; display: none;">
-                        <button hidden="true" type="button" id="cropButton" class="text-white bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Enregistrer</button>
-                      </form>
-                  {# {% endif %} #}
-            
-              {# <form id="uploadForm" enctype="multipart/form-data">
-                    <input type="file" id="imageInput" accept="image/*">
-                    <img id="imagePreview" style="max-width: 100%; display: none;">
-                    <button type="button" id="cropButton">Recadrer et Enregistrer</button>
-              </form> #}
-          </div> 
+
+          {# Si on a vraiment un URL de fichier, on affiche l’image croppée #}
+          {% if coverPath %}
+            <div id="cover_img_container" class="flex flex-col items-start justify-start w-full">
+              <div class="image-container">
+                <img
+                  id="cover_img"
+                  src="{{ coverPath | imagine_filter('thumbnail') }}"
+                  alt="Photo de couverture pour {{ projet.title }}"
+                >
+                <div class="overlay">
+                  <span class="overlay-text">Modifier</span>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          {# Toujours afficher le formulaire pour uploader ou ré-uploader #}
+          <form id="uploadForm" enctype="multipart/form-data">
+            <input type="hidden" id="projetId" name="projet_id" value="{{ projet.id }}">
+            <label
+              for="imageInput"
+              class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+            >
+              <div id="flowbite_area" class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg class="w-8 h-8 mb-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                  />
+                </svg>
+                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Cliquez pour uploader</span> ou glissez-déposez</p>
+                <p class="text-xs text-gray-500">SVG, PNG, JPG ou GIF (MAX. 800×400px)</p>
+              </div>
+            </label>
+
+            <input id="imageInput" type="file" class="hidden" accept="image/*"/>
+            <img id="imagePreview" style="max-width: 100%; display: none;">
+            <button
+              hidden
+              type="button"
+              id="cropButton"
+              class="text-white bg-blue-700 rounded-lg px-5 py-2.5 hover:bg-blue-800 focus:outline-none"
+            >
+              Enregistrer
+            </button>
+          </form>
+          <div class="w-full mt-5 border-gray-300 dark:border-gray-600">
+            <a id="cancelBtn"
+              class="w-full block text-center text-white bg-gradient-to-br from-pink-500 to-orange-400
+                      hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200
+                      dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2">
+              Annuler
+            </a>
+          </div>
+        </div> 
     </div> 
   </div>   
 </section>

@@ -6,38 +6,87 @@
 <section class="bg-white dark:bg-gray-900">
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
        
-        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Mais c'est qu'ils sont mignons <br>tout pleins vos projets !!!</h1>
-        <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le context et les rendre visibles au monde entier.</p>
+        <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+            Mais c'est qu'ils sont mignons <br>tout pleins vos projets !!!
+        </h1>
+        <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
+            Ici, vous pouvez créer des posts, incérer les visuels de vos projets créatifs, expliquer le contexte et les rendre visibles au monde entier.
+        </p>
         
     </div>
 
     <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-12 lg:px-12">
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
-            {# {{ form_widget(form) }}
-            {% if form.currentImagePath.vars.data %}
-                <div>
-                    <label>Image actuelle :</label>
-                    <img src="{{ asset(form.currentImagePath.vars.data) }}" alt="Image actuelle" style="max-width: 200px; max-height: 200px;">
-                </div>
-            {% endif %} #}
-            {# {{ form_row(form.title) }} #}
+        {{ form_start(form, {
+            attr: {
+                novalidate: 'novalidate',
+                enctype: 'multipart/form-data'
+            }
+        }) }}
+
             {{ form_row(form.title) }}
             {{ form_row(form.description) }}
             
             {# Prévisualisation de l'image existante #}
-            {% if form.currentImagePath.vars.data %}
-                <div>
-                    <label>Image actuelle :</label>
-                    <img src="{{ asset(form.currentImagePath.vars.data) }}" alt="Image actuelle" style="max-width: 200px; max-height: 200px;">
-                </div>
+            {% set firstSection = projet.sections|first %}
+            {% if firstSection and firstSection.photo %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Image de la 1ère section :</label>
+                <img
+                src="{{ firstSection.photo.url }}"
+                alt="{{ firstSection.photo.alt }}"
+                class="mt-2 rounded shadow"
+                style="max-width:200px; max-height:200px;"
+                >
+            </div>
             {% endif %}
 
-            {# Champ pour uploader une nouvelle image #}
-            {{ form_row(form.imageFile) }}
 
-            <button type="submit">Enregistrer</button>
-        {{ form_end(form) }}
+            {# --- File-input Flowbite customisé --- #}
+            <div class="flex items-center justify-center w-full">
+            {# on récupère l’ID unique du champ file Symfony #}
+            {% set fileId = form.imageFile.vars.id %}
+
+            <label for="{{ fileId }}"
+                    class="relative flex flex-col items-center justify-center w-full h-64
+                            border-2 border-gray-300 border-dashed rounded-lg cursor-pointer
+                            bg-gray-50 hover:bg-gray-100">
+
+                <div class="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
+                <!-- Icône + textes Flowbite -->
+                <svg class="w-8 h-8 mb-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 
+                            5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 
+                            5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                </svg>
+                <p class="mb-2 text-sm text-gray-500">
+                    <span class="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p class="text-xs text-gray-500">
+                    SVG, PNG, JPG or GIF (MAX. 3 Mo)
+                </p>
+                </div>
+
+                {{ form_widget(form.imageFile, {
+                    attr: {
+                    id: fileId,
+                    name: form.imageFile.vars.full_name,
+                    class: 'absolute inset-0 w-full h-full opacity-0 cursor-pointer'
+                    }
+                }) }}
+
+            </label>
+            {{ form_errors(form.imageFile) }}
             </div>
-   
+
+            {# <button
+                type="submit"
+                class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+                Enregistrer
+            </button> #}
+
+        {{ form_end(form) }}
+    </div>
 </section>
 {% endblock %}
